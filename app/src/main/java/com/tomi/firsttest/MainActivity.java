@@ -8,9 +8,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.view.View;
 import android.widget.TableLayout;
@@ -23,26 +22,27 @@ public class MainActivity extends AppCompatActivity {
     Spinner moznosti_spinner;
     ListView rychla_volba;
     Button buttonVolbaDialog;
-    Button celyTyzden;
-
-    Button buttonOpenDialog;
-
-    String KEY_TEXTPSS = "TEXTPSS";
-    static final int CUSTOM_DIALOG_ID = 0;
-
-    ListView dialog_ListView;
-
-    String[] listContent = {
-            "January", "February", "March", "April",
-            "May", "June", "July", "August", "September",
-            "October", "November", "December"};
+    Button tableSwitch;
+    Button buttonPrevious;
+    Button buttonNext;
+    Button buttonSearch;
+    EditText searchText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         rychla_volba = new ListView(this);
         final Context context = getApplicationContext();
+        final TableLayout layout = (TableLayout)findViewById(R.id.mTlayout);
+        final Table table = new Table(layout, context);
+
+        table.createTable();
+
+
+        //TODO make save load
+        final Parser parser = new Parser();
 
         // final ScrollView sv = new ScrollView(this);
         //final ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
@@ -62,90 +62,55 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(myIntent);
             }
         });
-        /*
-        TableLayout prices = (TableLayout)findViewById(R.id.mTlayout);
-        prices.setStretchAllColumns(true);
-        prices.bringToFront();
-        for(int i = 0; i < 15; i++){
 
-            TableRow tr =  new TableRow(this);
-            TextView c1 = new TextView(this);
-            c1.setText("text");
-            TextView c2 = new TextView(this);
-            c2.setText("text");
-            TextView c3 = new TextView(this);
-            c3.setText("text");
-            tr.addView(c1);
-            tr.addView(c2);
-            tr.addView(c3);
-            prices.addView(tr);
 
-        }
+        //TODO finish this
+        buttonSearch = (Button) findViewById(R.id.next);
+        searchText   = (EditText)findViewById(R.id.editText);
 
-        */
-
-        celyTyzden = (Button) findViewById(R.id.tyzden);
-        celyTyzden.setOnClickListener(new Button.OnClickListener() {
+        buttonSearch.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                /*
-                String[] row = {"ROW1", "ROW2", "Row3", "Row4", "Row 5", "Row 6",
-                        "Row 7"};
-                String[] column = {"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4",
-                        "COLUMN5", "COLUMN6"};
-                int rl = row.length;
-                int cl = column.length;
+                String searchName = searchText.getText().toString();
+                String type = ((String) moznosti_spinner.getSelectedItem());
+               // String type = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
 
-                Log.d("--", "R-Lenght--" + rl + "   " + "C-Lenght--" + cl);
-
-                ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
-                TableLayout tableLayout = createTableLayout(row, column, rl, cl);
-                HorizontalScrollView hsv = (HorizontalScrollView) findViewById(R.id.horizontalView);
-
-                //hsv.removeAllViews();
-                hsv.addView(tableLayout);
-               // sv.addView(hsv);
-                sv.removeAllViews();
-                setContentView(sv);
-                */
-                TableLayout layout = (TableLayout)findViewById(R.id.mTlayout);
-
-                Table table = new Table(layout, context);
-                table.dayTable();
-
-                /*
-                TableLayout prices = (TableLayout)findViewById(R.id.mTlayout);
-                prices.setStretchAllColumns(true);
-                prices.bringToFront();
-                for(int i = 0; i < 13; i++) {
-                    TableRow tr = new TableRow(c);
-                    for (int j = 0; j < 6; j++) {
-                        TextView view = new TextView(c);
-                        view.setText("text: i=" + i + " j=" + j);
-                        tr.addView(view);
-                    }
-                    prices.addView(tr);
-                }
-                */
-                    /*
-                    TableRow tr =  new TableRow(c);
-                    TextView c1 = new TextView(c);
-                    c1.setText("text");
-                    TextView c2 = new TextView(c);
-                    c2.setText("text");
-                    TextView c3 = new TextView(c);
-                    c3.setText("text");
-                    tr.addView(c1);
-                    tr.addView(c2);
-                    tr.addView(c3);
-                    prices.addView(tr);
-                    */
-
-
+                parser.parseHTML(searchName, type);
             }
+        });
 
 
+
+        tableSwitch = (Button) findViewById(R.id.tyzden);
+        buttonPrevious = (Button) findViewById(R.id.prev);
+        buttonNext = (Button) findViewById(R.id.next);
+
+        buttonPrevious.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                table.shiftDayBack();
+                table.createTable();
+            }
+        });
+
+        buttonNext.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                table.shiftDayForward();
+                table.createTable();
+            }
+        });
+
+        tableSwitch.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                table.changeView(tableSwitch, buttonPrevious, buttonNext);
+                table.createTable();
+            }
         });
 
 
