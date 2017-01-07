@@ -30,18 +30,19 @@
             android:layout_weight="1"
             android:id="@+id/moznosti_spinner" />
 
-
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Center" />
+            android:text="Center"
+            android:id="@+id/editText"/>
 
         <Button
             android:text="Vyhľadať"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:id="@+id/vyhladat" />
 
     </LinearLayout>
 
@@ -95,97 +96,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:id="@+id/predchadzajuci" />
+            android:id="@+id/prev" />
         <Button
             android:text="Nasledujúci deň"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:id="@+id/nasledujuci" />
-
-
+            android:id="@+id/next" />
     </LinearLayout>
-    <!--
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linear3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <TableRow>
-            <TextView
-                android:text="  8:10"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="  9:00"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="  9:50"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="10:40"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="11:30"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="12:20"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="13:10"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="14:00"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="14:50"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="15:40"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="16:30"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="17:20"
-                android:padding="3dip" />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="18:10"
-                android:padding="3dip" />
-
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="19:00"
-                android:padding="3dip" />
-        </TableRow>
-    </TableLayout>
--->
 
 
     <ScrollView
@@ -215,8 +133,6 @@
 
 
     </ScrollView>
-
-
 
 
 </RelativeLayout>

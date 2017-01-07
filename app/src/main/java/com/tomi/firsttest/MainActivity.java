@@ -2,6 +2,9 @@ package com.tomi.firsttest;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,9 +20,19 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.content.Intent;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
-    Spinner moznosti_spinner;
+public class MainActivity extends AppCompatActivity {
+//public class MainActivity extends FragmentActivity implements DownloadCallback {
+
+   // public class MainActivity extends FragmentActivity{
+
+            Spinner moznosti_spinner;
     ListView rychla_volba;
     Button buttonVolbaDialog;
     Button tableSwitch;
@@ -28,13 +41,70 @@ public class MainActivity extends AppCompatActivity {
     Button buttonSearch;
     EditText searchText;
 
+     Context context;
+
+
+    public Boolean amIConnectedToInternet() {
+        ConnectivityManager connMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+    /*
+   // @Override
+  /  public void updateFromDownload(String result) {
+        // Update your UI here based on result of download.
+   // }
+
+    @Override
+    public NetworkInfo getActiveNetworkInfo() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo;
+    }
+    */
+    /*
+    @Override
+    public void onProgressUpdate(int progressCode, int percentComplete) {
+        switch(progressCode) {
+            // You can add UI behavior for progress updates here.
+            case Progress.ERROR:
+                ...
+                break;
+            case Progress.CONNECT_SUCCESS:
+                ...
+                break;
+            case Progress.GET_INPUT_STREAM_SUCCESS:
+                ...
+                break;
+            case Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
+                ...
+                break;
+            case Progress.PROCESS_INPUT_STREAM_SUCCESS:
+                ...
+                break;
+        }
+    }
+
+
+    @Override
+    public void finishDownloading() {
+        mDownloading = false;
+        if (mNetworkFragment != null) {
+            mNetworkFragment.cancelDownload();
+        }
+    }
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        context = getApplicationContext();
+
         rychla_volba = new ListView(this);
-        final Context context = getApplicationContext();
+
         final TableLayout layout = (TableLayout)findViewById(R.id.mTlayout);
         final Table table = new Table(layout, context);
 
@@ -65,20 +135,72 @@ public class MainActivity extends AppCompatActivity {
 
 
         //TODO finish this
-        buttonSearch = (Button) findViewById(R.id.next);
+        buttonSearch = (Button) findViewById(R.id.vyhladat);
         searchText   = (EditText)findViewById(R.id.editText);
-
+/*
         buttonSearch.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 String searchName = searchText.getText().toString();
-                String type = ((String) moznosti_spinner.getSelectedItem());
-               // String type = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
+             //   String type = ((String) moznosti_spinner.getIte.getSelectedItem());
 
-                parser.parseHTML(searchName, type);
+              //  String id = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
+
+                // String type = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
+
+             //   parser.parseHTML(searchName, type);
             }
         });
+        */
+
+
+
+        buttonSearch.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+          //      String id = ((String)moznosti_spinner.getSelectedItem());
+              //  String id = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
+               // String id = moznosti_spinne
+             //
+
+                moznosti_spinner = (Spinner) findViewById(R.id.moznosti_spinner);
+                String result = moznosti_spinner.getSelectedItem().toString();
+                String searchName = searchText.getText().toString();
+               // String id = moznosti_spinner.;
+              //  TextView textView = (TextView)moznosti_spinner.getSelectedView();
+               // String wantid= textView.getResources().getResourceName(textView.getId());
+             //
+                String type;
+
+                switch(result){
+
+                    case("Vyucujuci"):type="ucitelia"; break;
+                    case("Miestnosti"):type="miestnosti"; break;
+                    default: type="ucitelia"; System.out.println("wrong type, can not add");
+
+                }
+                if(amIConnectedToInternet()){
+                    Log.v("connecttion: ", "ok");
+
+
+
+                    parser.parseHTML(searchName, type);
+                }else{
+                    Log.v("connecttion", "problem");
+                }
+
+                buttonSearch.setText("id"+type);
+
+
+
+            }
+        });
+
+
+
+
 
 
 

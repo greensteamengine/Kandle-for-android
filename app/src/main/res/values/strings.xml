@@ -3,8 +3,8 @@
     <string name="app_name">first.test</string>
 
     <string-array name="moznosti">
-        <item>Vyučujúci</item>
-        <item>Miestnosť</item>
+        <item>Vyucujuci</item>
+        <item>Miestnost</item>
     </string-array>
 
 
