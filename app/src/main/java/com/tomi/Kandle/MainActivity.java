@@ -1,8 +1,6 @@
 package com.tomi.Kandle;
 
-import android.app.Application;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -15,40 +13,29 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.view.View;
 import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.content.Intent;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    //    public class MainActivity extends  Application {
-//public class MainActivity extends FragmentActivity implements DownloadCallback {
 
-   // public class MainActivity extends FragmentActivity{
 
     Spinner moznosti_spinner;
     ListView rychla_volba;
     Button buttonVolbaDialog;
-    Button tableSwitch;// = (Button) findViewById(R.id.tyzden);
-    Button buttonPrevious;// = (Button) findViewById(R.id.prev);
-    Button buttonNext;// = (Button) findViewById(R.id.next);
+    Button tableSwitch;
+    Button buttonPrevious;
+    Button buttonNext;
     Button buttonSearch;
     Button buttonSave;
     EditText searchText;
 
-    Context context;//  = getApplicationContext();
-
-    //int id;
+    Context context;
 
     //TODO make save load
-    TableLayout layout;// = (TableLayout)findViewById(R.id.mTlayout);
-    Table table;// = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
-    Parser parser;// = new Parser(table);
-
-
-
-
+    TableLayout layout;
+    Table table;
+    Parser parser;
 
     public Boolean amIConnectedToInternet() {
         ConnectivityManager connMgr = (ConnectivityManager) context
@@ -64,11 +51,10 @@ public class MainActivity extends AppCompatActivity {
         if(parser != null && table != null){
             savedInstanceState.putSerializable("allTables", parser.giveAllTimetables());
             savedInstanceState.putSerializable("currentTable", parser.getTable().getWholeTable());
+            savedInstanceState.putSerializable("table", parser.getCurrentTimetable());
             savedInstanceState.putBoolean("onlyDay", parser.getTable().getOnlyDay());
             savedInstanceState.putInt("id", parser.getTable().getDay());
-            savedInstanceState.putSerializable("table", parser.getCurrentTimetable());
         }
-
         super.onSaveInstanceState(savedInstanceState);
     }
     @Override
@@ -78,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
             parser.setAllTimetables((ArrayList<Timetable>) savedInstanceState.getSerializable("allTables"));
             parser.getTable().setWholeTable((ArrayList<ArrayList<String>>)savedInstanceState.getSerializable("currentTable"));
+            parser.setCurrentTimetable((Timetable) savedInstanceState.getSerializable("table"));
             parser.getTable().setOnlyDay(savedInstanceState.getBoolean("onlyDay"));
             parser.getTable().setday(savedInstanceState.getInt("id"));
-            parser.setCurrentTimetable((Timetable) savedInstanceState.getSerializable("table"));
-           // table.createTable(false);
             parser.draw(false);
         }
     }
@@ -89,43 +74,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         context = getApplicationContext();
-
         rychla_volba = new ListView(this);
+        layout = (TableLayout)findViewById(R.id.mTlayout);
+
+        buttonVolbaDialog = (Button) findViewById(R.id.rychla_volba);
+        buttonSearch = (Button) findViewById(R.id.vyhladat);
+        buttonPrevious = (Button) findViewById(R.id.prev);
+        buttonNext = (Button) findViewById(R.id.next);
+        tableSwitch = (Button) findViewById(R.id.tyzden);
+        buttonSave = (Button) findViewById(R.id.save);
 
         table = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
         parser = new Parser(table);
         parser.draw(false);
 
-        layout = (TableLayout)findViewById(R.id.mTlayout);
-
-        tableSwitch = (Button) findViewById(R.id.tyzden);
-        buttonPrevious = (Button) findViewById(R.id.prev);
-        buttonNext = (Button) findViewById(R.id.next);
-
-
-
-        //table.createTable(false);
 
 
 
 
-        buttonVolbaDialog = (Button) findViewById(R.id.rychla_volba);
+
+
+
         buttonVolbaDialog.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                // Start NewActivity.class
-
-                ArrayList<Timetable> joinedTable = new ArrayList<>();
-
 
                 Intent myIntent = new Intent(MainActivity.this,
                         ListViewCheckboxesActivity.class);
@@ -138,10 +115,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         //TODO finish this
-        buttonSearch = (Button) findViewById(R.id.vyhladat);
+
         searchText   = (EditText)findViewById(R.id.editText);
 
         buttonSearch.setOnClickListener(new Button.OnClickListener() {
@@ -155,11 +130,9 @@ public class MainActivity extends AppCompatActivity {
                 String type;
 
                 switch(result){
-
                     case("Vyucujuci"):type="ucitelia"; break;
                     case("Miestnost"):type="miestnosti"; break;
                     default: type="ucitelia"; System.out.println("wrong type, can not add");
-
                 }
                 if(amIConnectedToInternet()){
                     Log.v("connecttion: ", "ok");
@@ -167,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                     if(!parser.IsParsing()){
                         parser.parseHTML(searchName, type);
                         parser.draw(false);
-                       // table.createTable(false);
                     }
                 }else{
                     Log.v("connection", "problem");
@@ -176,17 +148,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         buttonPrevious.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 table.shiftDayBack();
                 parser.draw(false);
-                //table.createTable(false);
             }
         });
+
+
 
         buttonNext.setOnClickListener(new Button.OnClickListener() {
 
@@ -194,27 +165,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 table.shiftDayForward();
                 parser.draw(false);
-                //table.createTable(false);
             }
         });
+
 
         tableSwitch.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-              //  table.changeView(tableSwitch, buttonPrevious, buttonNext);
-                //table.createTable(true);
                 parser.draw(true);
             }
         });
 
 
-        buttonSave = (Button) findViewById(R.id.save);
         buttonSave.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                //  table.changeView(tableSwitch, buttonPrevious, buttonNext);
                 parser.saveTable();
             }
 
@@ -223,35 +190,31 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-        Spinner spinner = (Spinner) findViewById(R.id.moznosti_spinner);
+        moznosti_spinner = (Spinner) findViewById(R.id.moznosti_spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.moznosti, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
+        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        // Apply the adapter to the spinner
+        moznosti_spinner.setAdapter(adapter);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v("??????", "can i get through???????????");
-        Log.v("data", "requestcode: "+requestCode+" resultCode: "+ resultCode);
+      //  Log.v("??????", "can i get through???????????");
+      //  Log.v("data", "requestcode: "+requestCode+" resultCode: "+ resultCode);
 
         if (requestCode == 3 && resultCode == RESULT_OK && data != null) {
 
-            Log.v("hahahah", "got hereeeee");
-            //Bundle b = ;
+           // Log.v("hahahah", "got hereeeee");
 
-            parser.setAllTimetables((ArrayList<Timetable>) data.getExtras().getSerializable("myJoinedTable"));// = data.getIntExtra(Number1Code);
-            int id = data.getExtras().getInt("selected");//.getSerializable("selected");
-            //parser.setAllTimetables();
+            parser.setAllTimetables((ArrayList<Timetable>) data.getExtras().getSerializable("myJoinedTable"));
+            int id = data.getExtras().getInt("selected");
+            Log.v("id arrived", " "+id);
             if(id != -1){
                 parser.setCurrentTimetable(parser.getConcreteTimetable(id));
             }
-           // table.createTable(false);
             parser.draw(false);
         }
     }

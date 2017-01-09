@@ -3,6 +3,7 @@ package com.tomi.Kandle;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -18,14 +19,15 @@ import java.util.Calendar;
 public class Table implements Serializable {
     TableLayout table;
     Context context;
-    Boolean onlyDay;
+    Calendar calendar = Calendar.getInstance();
+
     Button tableSwitch;
     Button prev;
     Button next;
-   // ArrayList<ArrayList<String>> tableRows = new ArrayList<ArrayList<String>>();
-    ArrayList<ArrayList<String>> tableColumns = new ArrayList<ArrayList<String>>();
-    Calendar calendar = Calendar.getInstance();
-    int day =  ((calendar.get(Calendar.DAY_OF_WEEK)-calendar.MONDAY + 7) % 7) + 1;
+
+    private ArrayList<ArrayList<String>> tableColumns = new ArrayList<ArrayList<String>>();
+    private int day =  ((calendar.get(Calendar.DAY_OF_WEEK)-calendar.MONDAY + 7) % 7) + 1;
+    private Boolean onlyDay;
 
     public ArrayList<ArrayList<String>> getWholeTable(){
         return tableColumns;
@@ -58,26 +60,7 @@ public class Table implements Serializable {
         this.tableSwitch = tableSwitch;
         this.prev = prev;
         this.next = next;
-
-
-
         /*
-        ArrayList<String> daysOfWeek = new ArrayList<String>(Arrays.asList(
-                "zaciatok", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok"));
-
-        tableRows.add(daysOfWeek);
-
-        int hour = 8;
-        int minutes = 10;
-
-        for(int i = 0; i < 14; i++){
-            ArrayList<String> rowOfTable = new ArrayList<>();
-            hour += (hour*60 + i*50)%60;
-            minutes = (minutes+(i*50))%60;
-            rowOfTable.add(hour + ":" + minutes);
-            tableRows.add(rowOfTable);
-        }
-        */
         ArrayList<String> timesOfClasses = new ArrayList<String>(Arrays.asList(
                 "zaciatok", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
                 "13:10", "14:00", "14:50", "15:40", "16:30", "17:20", "18:10", "19:00"));
@@ -101,17 +84,63 @@ public class Table implements Serializable {
         tableColumns.add(Wednesday);
         tableColumns.add(Thursday);
         tableColumns.add(Friday);
+        */
+
+        tableColumns = giveEmptyTable();
 
     }
 
+    public ArrayList<ArrayList<String>> giveEmptyTable(){
+        ArrayList<ArrayList<String>> newtTable = new ArrayList<ArrayList<String>>();
+
+        ArrayList<String> timesOfClasses = new ArrayList<String>(Arrays.asList(
+                "zaciatok", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
+                "13:10", "14:00", "14:50", "15:40", "16:30", "17:20", "18:10", "19:00"));
+        ArrayList<String> Monday = new ArrayList<String>(Arrays.asList("Pondelok"));
+        ArrayList<String> Thuesday = new ArrayList<String>(Arrays.asList("Utorok"));
+        ArrayList<String> Wednesday = new ArrayList<String>(Arrays.asList("Streda"));
+        ArrayList<String> Thursday = new ArrayList<String>(Arrays.asList("Štvrtok"));
+        ArrayList<String> Friday = new ArrayList<String>(Arrays.asList("Piatok"));
+
+        for(int i = 1; i < 16; i++){
+            Monday.add(" ");
+            Thuesday.add(" ");
+            Wednesday.add(" ");
+            Thursday.add(" ");
+            Friday.add(" ");
+        }
+
+        newtTable.add(timesOfClasses);
+        newtTable.add(Monday);
+        newtTable.add(Thuesday);
+        newtTable.add(Wednesday);
+        newtTable.add(Thursday);
+        newtTable.add(Friday);
+
+        return newtTable;
+
+    }
+
+
+
     public void clearTable(){
-        for (ArrayList<String> day : tableColumns)
-        {
-            for (String classes : day)
-            {
-                classes = "  ";
+
+        Log.v("clearing", "should be clear");
+
+
+        for(int i = 1; i < tableColumns.size(); i++){
+            for(int j = 1; j < tableColumns.size(); j++){
+                tableColumns.get(i).set(j, " ");
             }
         }
+
+       // for (ArrayList<String> day : tableColumns)
+       // {
+         //   for (String classes : day)
+          //  {
+          //      classes = "  ";
+          //  }
+       // }
     }
 
 
@@ -119,9 +148,10 @@ public class Table implements Serializable {
 
     public void modifyTable(Timetable timetable){
 
-        clearTable();
+       // tableColumns.
+       // clearTable();
+        tableColumns = giveEmptyTable();
 
-        //ArrayList<Lesson> lessons = timetable.getLessons();
         for(Lesson lesson: timetable.getLessons()){
             String day = lesson.getDay();
             int from = lesson.getSerialNumberOfStart()+1;
@@ -142,6 +172,7 @@ public class Table implements Serializable {
         }
     }
 
+
     public void shiftDayBack(){
         if(day == 1)day = 5; else day -= 1;
     }
@@ -150,27 +181,12 @@ public class Table implements Serializable {
     }
 
     public void createTable(Boolean change, Timetable timetable){
-        modifyTable(timetable);
-        if(change)changeView();//changeView(tableSwitch, prev, next);
+    //public void createTable(Boolean change){
+        if(timetable !=null)modifyTable(timetable);
+        if(change)changeView();
         table.removeAllViews();
         if(onlyDay)dayTable(); else weekTable();
     }
-
-   // private void changeView(Button tableSwitch, Button prev, Button next){
-     //   onlyDay ^= true;
-        /*
-        if(onlyDay){
-            tableSwitch.setText("Zobrazit cely tyzden");
-            prev.setVisibility(View.VISIBLE);
-            next.setVisibility(View.VISIBLE);
-        }
-        else {
-            tableSwitch.setText("Zobrazit iba den");
-            prev.setVisibility(View.GONE);
-            next.setVisibility(View.GONE);
-        }
-        */
-    //}
 
     private void changeView(){
         onlyDay ^= true;
@@ -190,7 +206,6 @@ public class Table implements Serializable {
 
 
         if (day < 1 || day > 5) day = 1;
-        //for(String column: tableColumns.get(id)){
         for (int i = 0; i < 15; i++) {
 
             TableRow tr = new TableRow(context);
@@ -201,19 +216,20 @@ public class Table implements Serializable {
             tr.addView(viewTime);
 
             TextView view = new TextView(context);
-            //view.setText("test id: " + id);
+
             view.setText(tableColumns.get(day).get(i));
+
             view.setTextColor(Color.BLACK);
             tr.addView(view);
+
             if(tableColumns.get(day).get(i) == " "){
-                view.setBackgroundColor(Color.GREEN);
-            }else{
                 view.setBackgroundColor(Color.WHITE);
+            }else{
+                view.setBackgroundColor(Color.GREEN);
             }
 
             table.addView(tr);
         }
-
     }
 
     private void weekTable(){
@@ -228,22 +244,22 @@ public class Table implements Serializable {
 
         for(int i = 0; i<15; i++){
 
-
             TableRow tr = new TableRow(context);
             for(ArrayList<String> column: tableColumns){
 
                 TextView view = new TextView(context);
+
                 view.setText(column.get(i));
+
                 if(column.get(i) == " "){
-                    view.setBackgroundColor(Color.GREEN);
-                }else{
                     view.setBackgroundColor(Color.WHITE);
+                }else{
+                    view.setBackgroundColor(Color.GREEN);
                 }
                 view.setTextColor(Color.BLACK);
                 tr.addView(view);
             }
             table.addView(tr);
-            //view.setText("test id: " + id);
         }
     }
 }

@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -30,19 +29,15 @@ import android.util.Log;
 
 public class ThreadInternet extends Thread {
 
-    String text = "nothing";
-    HttpURLConnection http = null;
-    InputStream is = null;
-    String urlString = "";
-    String nickUrl = "";
-    int len = 2000;
-    ArrayList<String> htmlCode =  new ArrayList<>();
-    public ThreadInternet(int len) {
-        this.len = len;
-    }
-    //ak nezadame dlzku, nacita sa cela stranka
-    public ThreadInternet() {
-    }
+    private String text = "nothing";
+    private String urlString = "";
+
+    private HttpURLConnection http = null;
+    private InputStream inputStream = null;
+
+    private int len = 2000;
+    private ArrayList<String> htmlCode =  new ArrayList<>();
+
 
     public void urlSet(String urlString){
         this.urlString = urlString;
@@ -90,7 +85,7 @@ public class ThreadInternet extends Thread {
      */
     public String readIt(InputStream stream, int len) throws IOException,
             UnsupportedEncodingException {
-        Reader reader = null;
+        Reader reader;
         reader = new InputStreamReader(stream, "UTF-8");
         char[] buffer = new char[len];
         reader.read(buffer);
@@ -107,70 +102,8 @@ public class ThreadInternet extends Thread {
     }
 
     public InputStream getIS(){
-        return is;
+        return inputStream;
     }
-
-    public BufferedReader returnBuffer(){
-        return new BufferedReader(new InputStreamReader(is));
-    }
-
-    /**
-     * Connect to the server and download data, make string from it.
-     *
-     * Max length of sting is 2000 characters.
-     */
-
-    public static InputStream getHtml(String url) throws IOException {
-        // Build and set timeout values for the request.
-        URLConnection connection = (new URL(url)).openConnection();
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-        connection.connect();
-
-        // Read and store the result line by line then return the entire string.
-        InputStream in = connection.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        StringBuilder html = new StringBuilder();
-        for (String line; (line = reader.readLine()) != null; ) {
-            html.append(line);
-        }
-        in.close();
-
-        return in;
-    }
-    /*
-    @Override
-    public void run() {
-        try {
-            //  URL url = new URL(urlString);
-           // URL url = new URL("https://candle.fmph.uniba.sk/ucitelia/Michal-Forisek");
-            URLConnection connection = (new URL("https://candle.fmph.uniba.sk/ucitelia/Michal-Forisek")).openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            connection.connect();
-
-            // Read and store the result line by line then return the entire string.
-             is = connection.getInputStream();
-           // BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-           // StringBuilder html = new StringBuilder();
-           // for (String line; (line = reader.readLine()) != null; ) {
-           //     html.append(line);
-           // }
-            is.close();
-            Log.v("code", "here i am");
-
-
-        } catch (Throwable  e) {
-            //  Log.w("Debug the problem", e.toString());
-            Log.v("Debug message", "-"+e.toString()+"-");
-            text = Integer.toString(-1);
-        }
-        Log.v("Thread", "finished?");
-        // Thread.currentThread().interrupt();
-    }
-
-
-*/
 
 
     @Override
@@ -178,51 +111,40 @@ public class ThreadInternet extends Thread {
         try {
 
 
-            URL url = new URL(urlString);
-           // URL url = new URL("https://candle.fmph.uniba.sk/ucitelia/Michal-Forisek");
+            URL urlString = new URL(this.urlString);
 
-            Log.v("code", "at least it tried");
+          //  Log.v("code", "at least it tried");
 
-            // bezpecnost este prekonzultujeme.
-            if (url.getProtocol().toLowerCase().equals("https")) {
+            if (urlString.getProtocol().toLowerCase().equals("https")) {
                 trustAllHosts();
-                HttpsURLConnection https = (HttpsURLConnection) url
+                HttpsURLConnection https = (HttpsURLConnection) urlString
                         .openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 http = https;
-               // https.disconnect();
 
                 Log.v("code", "runing thread");
 
             } else {
-                http = (HttpURLConnection) url.openConnection();
+                http = (HttpURLConnection) urlString.openConnection();
             }
 
             http.connect();
-            is = http.getInputStream();
-            InputStream is2 = http.getInputStream();
-           // is = url.openStream();
+            inputStream = http.getInputStream();
+            InputStream inputstream2 = http.getInputStream();
             String line;
-            BufferedReader r = new BufferedReader(new InputStreamReader(is2));
+            BufferedReader r = new BufferedReader(new InputStreamReader(inputstream2));
             while ((line=r.readLine()) != null) {
                 htmlCode.add(line);
-                //Log.v("line", htmlCode.get(htmlCode.size()-1));
             }
 
-            text = readIt(is, len);
+            text = readIt(inputStream, len);
             http.disconnect();
 
-           // Log.v("html", text);
-
-
         } catch (Throwable  e) {
-          //  Log.w("Debug the problem", e.toString());
-            Log.v("Debug message", "-"+e.toString()+"-");
+           // Log.v("Debug message", "-"+e.toString()+"-");
             text = Integer.toString(-1);
         }
-        Log.v("Thread", "finished?");
-       // Thread.currentThread().interrupt();
+       // Log.v("Thread", "finished?");
     }
-
 }
 
