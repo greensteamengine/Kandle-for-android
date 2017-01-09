@@ -231,7 +231,7 @@ public class ListViewCheckboxesActivity extends Activity {
 
                 ArrayList<Timetable> countryList = dataAdapter.tableList;
                 for(int i=0;i<countryList.size();i++){
-                    Timetable country = joinedTable.get(i);
+                   // Timetable country = joinedTable.get(i);
                     if(checked.get(i)){
                         joinedTable.remove(i);
                         checked.remove(i);
@@ -240,7 +240,7 @@ public class ListViewCheckboxesActivity extends Activity {
                     myIntent.putExtra("myJoinedTable", joinedTable);
                     //myIntent.putExtra("selected", id);
                 }
-                countryList = joinedTable;
+               // countryList = joinedTable;
                 //for(Timetable timetable: joinedTable){
                   //  int index = joinedTable.indexOf(timetable);
                  //   if(){

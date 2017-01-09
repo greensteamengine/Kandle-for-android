@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
 
         if(parser != null && table != null){
-           // savedInstanceState.putSerializable("teachers", parser.giveTeachers());
-           // savedInstanceState.putSerializable("rooms", parser.giveRooms());
             savedInstanceState.putSerializable("allTables", parser.giveAllTimetables());
             savedInstanceState.putSerializable("currentTable", parser.getTable().getWholeTable());
             savedInstanceState.putBoolean("onlyDay", parser.getTable().getOnlyDay());
@@ -71,57 +69,53 @@ public class MainActivity extends AppCompatActivity {
             savedInstanceState.putSerializable("table", parser.getCurrentTimetable());
         }
 
-        // etc.
         super.onSaveInstanceState(savedInstanceState);
     }
-    //onRestoreInstanceState
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if(parser != null && table != null) {
-           /// parser.setTeachers((ArrayList<Timetable>) savedInstanceState.getSerializable("teachers"));
-           // parser.setRooms((ArrayList<Timetable>) savedInstanceState.getSerializable("rooms"));
+
             parser.setAllTimetables((ArrayList<Timetable>) savedInstanceState.getSerializable("allTables"));
             parser.getTable().setWholeTable((ArrayList<ArrayList<String>>)savedInstanceState.getSerializable("currentTable"));
             parser.getTable().setOnlyDay(savedInstanceState.getBoolean("onlyDay"));
             parser.getTable().setday(savedInstanceState.getInt("id"));
             parser.setCurrentTimetable((Timetable) savedInstanceState.getSerializable("table"));
-            table.createTable(false);
+           // table.createTable(false);
+            parser.draw(false);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         context = getApplicationContext();
 
         rychla_volba = new ListView(this);
 
-        //final TableLayout layout = (TableLayout)findViewById(R.id.mTlayout);
+        table = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
+        parser = new Parser(table);
+        parser.draw(false);
+
         layout = (TableLayout)findViewById(R.id.mTlayout);
 
         tableSwitch = (Button) findViewById(R.id.tyzden);
         buttonPrevious = (Button) findViewById(R.id.prev);
         buttonNext = (Button) findViewById(R.id.next);
 
-        //final Table table = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
-        table = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
 
-        table.createTable(false);
 
-         parser = new Parser(table);
+        //table.createTable(false);
 
 
 
-
-        // final ScrollView sv = new ScrollView(this);
-        //final ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
-        //ScrollView sv = new ScrollView(this);
-        //final TableLayout ll = new TableLayout(this);
-        //HorizontalScrollView hsv = new HorizontalScrollView(this);
-        //final HorizontalScrollView hsv = new HorizontalScrollView(this);
 
         buttonVolbaDialog = (Button) findViewById(R.id.rychla_volba);
         buttonVolbaDialog.setOnClickListener(new Button.OnClickListener() {
@@ -131,9 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 // Start NewActivity.class
 
                 ArrayList<Timetable> joinedTable = new ArrayList<>();
-                //joinedTable.addAll(parser.giveRooms());
-               // joinedTable.addAll(parser.giveTeachers());
-
 
 
                 Intent myIntent = new Intent(MainActivity.this,
@@ -142,21 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 //setResult(RESULT_OK, myIntent);
 
                 startActivityForResult(myIntent, 3);
-
-
-
-                //setResult(RESULT_OK, myIntent);
-                //startActivity(myIntent);
-               // myIntent.on
-
-
-              //  if (requestCode == ActivityTwoRequestCode && resultCode == RESULT_OK && data != null) {
-               //     num1 = data.getIntExtra(Number1Code);
-               //     num2 = data.getIntExtra(Number2Code);
-                //}
-
-                //myIntent.putExtra("myJoinedTable", joinedTable);
-                //myIntent.putExtra("selected", id);
 
             }
         });
@@ -167,41 +143,15 @@ public class MainActivity extends AppCompatActivity {
         //TODO finish this
         buttonSearch = (Button) findViewById(R.id.vyhladat);
         searchText   = (EditText)findViewById(R.id.editText);
-/*
-        buttonSearch.setOnClickListener(new Button.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                String searchName = searchText.getText().toString();
-             //   String type = ((String) moznosti_spinner.getIte.getSelectedItem());
-
-              //  String id = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
-
-                // String type = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
-
-             //   parser.parseHTML(searchName, type);
-            }
-        });
-        */
-
-
 
         buttonSearch.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-          //      String id = ((String)moznosti_spinner.getSelectedItem());
-              //  String id = moznosti_spinner.get(moznosti_spinner.getSelectedItemPosition()).getId();
-               // String id = moznosti_spinne
-             //
 
                 moznosti_spinner = (Spinner) findViewById(R.id.moznosti_spinner);
                 String result = moznosti_spinner.getSelectedItem().toString();
                 String searchName = searchText.getText().toString();
-               // String id = moznosti_spinner.;
-              //  TextView textView = (TextView)moznosti_spinner.getSelectedView();
-               // String wantid= textView.getResources().getResourceName(textView.getId());
-             //
                 String type;
 
                 switch(result){
@@ -216,13 +166,12 @@ public class MainActivity extends AppCompatActivity {
 
                     if(!parser.IsParsing()){
                         parser.parseHTML(searchName, type);
-                        table.createTable(false);
+                        parser.draw(false);
+                       // table.createTable(false);
                     }
                 }else{
                     Log.v("connection", "problem");
                 }
-                //table.createTable(false);
-                //buttonSearch.setText("id"+type);
             }
         });
 
@@ -234,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 table.shiftDayBack();
-                table.createTable(false);
+                parser.draw(false);
+                //table.createTable(false);
             }
         });
 
@@ -243,7 +193,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 table.shiftDayForward();
-                table.createTable(false);
+                parser.draw(false);
+                //table.createTable(false);
             }
         });
 
@@ -252,7 +203,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
               //  table.changeView(tableSwitch, buttonPrevious, buttonNext);
-                table.createTable(true);
+                //table.createTable(true);
+                parser.draw(true);
             }
         });
 
@@ -299,10 +251,8 @@ public class MainActivity extends AppCompatActivity {
             if(id != -1){
                 parser.setCurrentTimetable(parser.getConcreteTimetable(id));
             }
-            table.createTable(false);
+           // table.createTable(false);
+            parser.draw(false);
         }
     }
-
-
-
 }

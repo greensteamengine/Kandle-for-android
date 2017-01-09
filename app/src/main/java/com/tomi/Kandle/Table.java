@@ -104,9 +104,23 @@ public class Table implements Serializable {
 
     }
 
+    public void clearTable(){
+        for (ArrayList<String> day : tableColumns)
+        {
+            for (String classes : day)
+            {
+                classes = "  ";
+            }
+        }
+    }
+
+
 
 
     public void modifyTable(Timetable timetable){
+
+        clearTable();
+
         //ArrayList<Lesson> lessons = timetable.getLessons();
         for(Lesson lesson: timetable.getLessons()){
             String day = lesson.getDay();
@@ -122,7 +136,7 @@ public class Table implements Serializable {
             }
             if(numOfDay!=0){
                 for(int i = from; i<= to; i++){
-                    tableColumns.get(numOfDay).set(i, " ");
+                    tableColumns.get(numOfDay).set(i, lesson.getRoom());
                 }
             }
         }
@@ -135,14 +149,15 @@ public class Table implements Serializable {
         if(day == 5)day = 1; else day += 1;
     }
 
-    public void createTable(Boolean change){
-        if(change)changeView(tableSwitch, prev, next);
+    public void createTable(Boolean change, Timetable timetable){
+        modifyTable(timetable);
+        if(change)changeView();//changeView(tableSwitch, prev, next);
         table.removeAllViews();
         if(onlyDay)dayTable(); else weekTable();
     }
 
-    private void changeView(Button tableSwitch, Button prev, Button next){
-        onlyDay ^= true;
+   // private void changeView(Button tableSwitch, Button prev, Button next){
+     //   onlyDay ^= true;
         /*
         if(onlyDay){
             tableSwitch.setText("Zobrazit cely tyzden");
@@ -155,9 +170,16 @@ public class Table implements Serializable {
             next.setVisibility(View.GONE);
         }
         */
+    //}
+
+    private void changeView(){
+        onlyDay ^= true;
+
     }
 
     private void dayTable() {
+
+        //clearTable();
 
         table.setStretchAllColumns(true);
         table.bringToFront();

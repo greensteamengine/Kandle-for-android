@@ -117,6 +117,10 @@ public class Parser implements Serializable{
         return in;
     }
 
+    public void draw(boolean change){
+        this.table.createTable(change, this.currentTimetable);
+    }
+
 
     /*
     when mor possiblities, then get them all and show
@@ -255,6 +259,7 @@ public class Parser implements Serializable{
                         printPossibleChoises(linesOfHtml, type);
                         break;
                     }else{
+                        table.clearTable();
                         currentTimetable = getTimetable(linesOfHtml, name, type);
                         table.modifyTable(currentTimetable);
                         haveSomethingToSave = true;
