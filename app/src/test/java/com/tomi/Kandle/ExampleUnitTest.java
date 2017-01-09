@@ -1,4 +1,4 @@
-package com.tomi.firsttest;
+package com.tomi.Kandle;
 
 import org.junit.Test;
 

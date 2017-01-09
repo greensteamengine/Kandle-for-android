@@ -1,8 +1,9 @@
-package com.tomi.firsttest;
+package com.tomi.Kandle;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Timetable {
+public class Timetable implements Serializable {
 
     ArrayList<Lesson> lessons;
     String nameOfTable;
@@ -12,6 +13,10 @@ public class Timetable {
         lessons = new ArrayList<>();
         this.nameOfTable = name;
         this.typeOfTable = type;
+    }
+
+    public ArrayList<Lesson> getLessons(){
+        return lessons;
     }
 
     public void addToTable(Lesson lesson){
@@ -24,10 +29,6 @@ public class Timetable {
 
     public String getType(){
         return typeOfTable;
-    }
-
-    public void addTable(Lesson l){
-        lessons.add(l);
     }
 
 }

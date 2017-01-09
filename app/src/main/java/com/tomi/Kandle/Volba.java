@@ -1,4 +1,4 @@
-package com.tomi.firsttest;
+package com.tomi.Kandle;
 
 /**
  * Created by Vicko on 27. 12. 2016.

@@ -1,4 +1,4 @@
-package com.tomi.firsttest;
+package com.tomi.Kandle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -178,8 +178,8 @@ public class ThreadInternet extends Thread {
         try {
 
 
-          //  URL url = new URL(urlString);
-            URL url = new URL("https://candle.fmph.uniba.sk/ucitelia/Michal-Forisek");
+            URL url = new URL(urlString);
+           // URL url = new URL("https://candle.fmph.uniba.sk/ucitelia/Michal-Forisek");
 
             Log.v("code", "at least it tried");
 
@@ -192,7 +192,7 @@ public class ThreadInternet extends Thread {
                 http = https;
                // https.disconnect();
 
-                Log.v("code", "at least it tried and got here");
+                Log.v("code", "runing thread");
 
             } else {
                 http = (HttpURLConnection) url.openConnection();
@@ -206,13 +206,13 @@ public class ThreadInternet extends Thread {
             BufferedReader r = new BufferedReader(new InputStreamReader(is2));
             while ((line=r.readLine()) != null) {
                 htmlCode.add(line);
-                Log.v("line", htmlCode.get(htmlCode.size()-1));
+                //Log.v("line", htmlCode.get(htmlCode.size()-1));
             }
 
             text = readIt(is, len);
             http.disconnect();
 
-            Log.v("html", text);
+           // Log.v("html", text);
 
 
         } catch (Throwable  e) {

@@ -1,4 +1,4 @@
-package com.tomi.firsttest;
+package com.tomi.Kandle;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

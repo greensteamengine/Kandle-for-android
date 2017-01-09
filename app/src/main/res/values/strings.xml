@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">first.test</string>
+    <string name="app_name">Kandle</string>
 
     <string-array name="moznosti">
         <item>Vyucujuci</item>
@@ -9,8 +9,8 @@
 
 
     <string name="app_name1">ListView Checkboxes</string>
- <string name="some_text">
-     Some North American Countries!
+ <string name="legenda">
+     Uložené rozvrhy
  </string>
 
 </resources>

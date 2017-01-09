@@ -8,14 +8,14 @@
 
     <TextView android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:padding="10dp"
-        android:text="@string/some_text" android:textSize="20sp" />
+        android:text="@string/legenda" android:textSize="20sp" />
 
 
     <Button
-        android:id="@+id/findSelected"
+        android:id="@+id/deleteSelected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Find countries that are Selected" />
+        android:text="Vymaž označené" />
 
     <ListView android:id="@+id/listView1" android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
