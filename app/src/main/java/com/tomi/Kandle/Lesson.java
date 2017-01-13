@@ -51,7 +51,7 @@ class Lesson implements Serializable {
         return lecturers;
     }
 
-    public int getSerialNumberOfStart(){
+    public Integer getSerialNumberOfStart(){
         String[] times =  from.split(":");
         Integer from;
          from = (((Integer.parseInt(times[0])*60 + Integer.parseInt(times[1]))-490)/50)+1;

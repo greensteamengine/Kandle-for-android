@@ -65,7 +65,7 @@ public class Parser implements Serializable{
     public void draw(boolean change){
         this.table.clearTable();
         this.table.createTable(change, this.currentTimetable);
-       // this.table.createTable(change);
+       // this.tableLayout.createTable(change);
     }
 
 
@@ -112,10 +112,11 @@ public class Parser implements Serializable{
             System.out.println(day + " " + from + " - " + to + " " + room + " " + typeOfLecture);
             Boolean finish = false;
 
-            while (words[pos].length() != 2 && !finish) {
-                if ((words[pos].length() == 2) && (words[pos].charAt(1) == '.')) {
-                    break;
-                }
+            while (words[pos].charAt(1) != '.') {
+               // if ((words[pos].length() == 2) && (words[pos].charAt(1) == '.')) {
+                    Log.v("gggg", ""+words[pos]);
+               //     break;
+               // }
                 nameOfLecture = nameOfLecture.concat(words[pos] + " ");
                 pos++;
             }
@@ -146,12 +147,12 @@ public class Parser implements Serializable{
 
                 String urlString2 = "https://candle.fmph.uniba.sk/"+type+"/"+name+".txt";
 
-                ThreadInternet thread = new ThreadInternet();
+                ThreadInternet thread = new ThreadInternet(this);
                 thread.urlSet(urlString2);
                 thread.start();
                 try {
-                    thread.join();
-                } catch (InterruptedException e) {
+                   // thread.join();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -163,6 +164,13 @@ public class Parser implements Serializable{
             }
         }
         return currentTimetable;
+    }
+
+    public void returnParsedData(ArrayList<String> htmlCode){
+        Log.v("check", "returning data");
+        for(String lineTextOfLecture: htmlCode){
+            currentTimetable.addToTable(parseLineOfText(lineTextOfLecture));
+        }
     }
 
 
@@ -186,7 +194,7 @@ public class Parser implements Serializable{
         try {
             String urlString = "https://candle.fmph.uniba.sk/?"+search+"="+name;
 
-            thread =  new ThreadInternet();
+            thread =  new ThreadInternet(this);
             thread.urlSet(urlString);
             thread.start();
             thread.join();
@@ -220,6 +228,10 @@ public class Parser implements Serializable{
         parsingNow = false;
         return currentTimetable;
     }
+
+
+    //public void send
+
 
     public void saveTable(){
             for(Timetable table: allTimetables){

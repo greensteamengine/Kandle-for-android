@@ -1,5 +1,7 @@
 package com.tomi.Kandle;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -37,6 +39,10 @@ public class Timetable implements Serializable {
         return nameOfTable;
     }
 
+    public void setName(String name){
+        Log.v("timetable class", "setting name");
+        this.nameOfTable = name;
+    }
     public String getType(){
         return typeOfTable;
     }

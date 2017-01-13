@@ -24,7 +24,7 @@ public class ListViewCheckboxesActivity extends Activity {
 
     MyCustomAdapter dataAdapter = null;
     ArrayList<Timetable> joinedTable = new ArrayList<>();
-   
+
     int id = -1;
     Intent myIntent;
 
@@ -115,6 +115,7 @@ public class ListViewCheckboxesActivity extends Activity {
                                 "Clicked on Checkbox: " + cb.getText() +
                                         " inputStream " + cb.isChecked(),
                                 Toast.LENGTH_LONG).show();
+                       // if(table.is)
                         Log.v("selected timetable", country.getName() + " index of country: " + joinedTable.indexOf(country));
                         joinedTable.get(joinedTable.indexOf(country)).check(cb.isChecked());
                     }
@@ -123,10 +124,10 @@ public class ListViewCheckboxesActivity extends Activity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            Timetable country = joinedTable.get(position);
-            holder.code.setText(country.getType());
-            holder.name.setText(country.getName());
-            holder.name.setTag(country);
+            Timetable timetable = joinedTable.get(position);
+            holder.code.setText(" ("+timetable.getType()+") ");
+            holder.name.setText(timetable.getName());
+            holder.name.setTag(timetable);
 
             return convertView;
         }

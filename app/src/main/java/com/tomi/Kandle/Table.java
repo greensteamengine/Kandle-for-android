@@ -1,10 +1,17 @@
 package com.tomi.Kandle;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -17,17 +24,39 @@ import java.util.Calendar;
 
 
 public class Table implements Serializable {
-    TableLayout table;
+    TableLayout tableLayout;
     Context context;
     Calendar calendar = Calendar.getInstance();
+
+    LinearLayout layout1;
+    LinearLayout layout2;
+    LinearLayout layout3;
+    Spinner moznosti_spinner;
+    EditText searchText;
+    Button buttonSearch;
 
     Button tableSwitch;
     Button prev;
     Button next;
+    Button save;
+    Button rychla_volba;
+    ScrollView scrollView;
+
+
 
     private ArrayList<ArrayList<String>> tableColumns = new ArrayList<ArrayList<String>>();
     private int day =  ((calendar.get(Calendar.DAY_OF_WEEK)-calendar.MONDAY + 7) % 7) + 1;
     private Boolean onlyDay;
+    private Boolean searchingMode = false;
+    private Timetable currentTimetable;
+
+    public boolean isSearchMode(){
+        return searchingMode;
+    }
+
+    public void setSearchMode(boolean sm){
+        this.searchingMode = sm;
+    }
 
     public ArrayList<ArrayList<String>> getWholeTable(){
         return tableColumns;
@@ -52,14 +81,99 @@ public class Table implements Serializable {
     public void setWholeTable(ArrayList<ArrayList<String>> tableColumns){
         this.tableColumns = tableColumns;
     }
+    Activity activity;
 
-    public Table(TableLayout table, Context context, Button tableSwitch, Button prev, Button next){
-        this.table = table;
-        this.context = context;
+    public Table(Activity activity){
+        this.activity = activity;
+
+        this.layout1 = (LinearLayout) activity.findViewById(R.id.linear1);
+        scrollView = (ScrollView) activity.findViewById(R.id.scrollView);
+        this.layout2 = (LinearLayout) activity.findViewById(R.id.linear2);
+        this.layout3 = (LinearLayout) activity.findViewById(R.id.linear3);
+        this.moznosti_spinner =(Spinner) activity.findViewById(R.id.moznosti_spinner);
+        this.searchText = (EditText)activity.findViewById(R.id.editText);
+        this.buttonSearch = (Button)activity.findViewById(R.id.vyhladat);
+        this.tableLayout =  (TableLayout)activity.findViewById(R.id.mTlayout);
+        this.context = activity.getApplicationContext();
         this.onlyDay = true;
-        this.tableSwitch = tableSwitch;
-        this.prev = prev;
-        this.next = next;
+        this.tableSwitch = (Button)activity.findViewById(R.id.tyzden);
+        this.prev = (Button)activity.findViewById(R.id.prev);
+        this.next = (Button)activity.findViewById(R.id.next);
+        this.save = (Button)activity.findViewById(R.id.save);
+        this.rychla_volba = (Button)activity.findViewById(R.id.rychla_volba2);
+
+
+        tableColumns = giveEmptyTable();
+    }
+
+    void hideButtons(){
+        if(searchingMode){
+
+            layout1.setVisibility(View.INVISIBLE);
+            scrollView.setVisibility(View.VISIBLE);
+
+            searchingMode = false;
+        }else{
+            layout1.setVisibility(View.VISIBLE);
+            scrollView.setVisibility(View.INVISIBLE);
+            searchingMode = true;
+        }
+
+    }
+    /*
+    void hideButtons(){
+        if(searchingMode){
+            layout1.setVisibility(View.INVISIBLE);
+            moznosti_spinner.setVisibility(View.INVISIBLE);
+            searchText.setVisibility(View.INVISIBLE);
+            buttonSearch.setVisibility(View.INVISIBLE);
+            save.setVisibility(View.INVISIBLE);
+            if(onlyDay){
+                prev.setVisibility(View.VISIBLE);
+                next.setVisibility(View.VISIBLE);
+                tableSwitch.setVisibility(View.VISIBLE);
+            }
+
+            searchingMode = false;
+        }else{
+            layout1.setVisibility(View.VISIBLE);
+            moznosti_spinner.setVisibility(View.VISIBLE);
+            searchText.setVisibility(View.VISIBLE);
+            buttonSearch.setVisibility(View.VISIBLE);
+            save.setVisibility(View.VISIBLE);
+            //if(onlyDay){
+                prev.setVisibility(View.INVISIBLE);
+                next.setVisibility(View.INVISIBLE);
+                tableSwitch.setVisibility(View.INVISIBLE);
+            //}
+            searchingMode = true;
+        }
+
+    }
+    */
+
+    /*
+    public Table(TableLayout table, Context context, Button tableSwitch, Button prev, Button next){
+        this.moznosti_spinner =(Spinner) activity.findViewById(R.id.moznosti_spinner);;
+        this.searchText = (EditText)activity.findViewById(R.id.editText);;
+        this.buttonSearch = (Button)activity.findViewById(R.id.vyhladat);;
+        this.tableLayout =  (TableLayout)activity.findViewById(R.id.mTlayout);
+        this.context = activity.getApplicationContext();
+        this.onlyDay = true;
+        this.tableSwitch = (Button)activity.findViewById(R.id.tyzden);
+        this.prev = (Button)activity.findViewById(R.id.prev);
+        this.next = (Button)activity.findViewById(R.id.next);
+        save = (Button)activity.findViewById(R.id.save);
+        rychla_volba = (Button)activity.findViewById(R.id.rychla_volba);
+
+
+        tableColumns = giveEmptyTable();
+
+    }
+    */
+
+
+
         /*
         ArrayList<String> timesOfClasses = new ArrayList<String>(Arrays.asList(
                 "zaciatok", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
@@ -86,15 +200,16 @@ public class Table implements Serializable {
         tableColumns.add(Friday);
         */
 
-        tableColumns = giveEmptyTable();
 
-    }
+
+
+
 
     public ArrayList<ArrayList<String>> giveEmptyTable(){
         ArrayList<ArrayList<String>> newtTable = new ArrayList<ArrayList<String>>();
 
         ArrayList<String> timesOfClasses = new ArrayList<String>(Arrays.asList(
-                "zaciatok", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
+                "...", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
                 "13:10", "14:00", "14:50", "15:40", "16:30", "17:20", "18:10", "19:00"));
         ArrayList<String> Monday = new ArrayList<String>(Arrays.asList("Pondelok"));
         ArrayList<String> Thuesday = new ArrayList<String>(Arrays.asList("Utorok"));
@@ -133,14 +248,6 @@ public class Table implements Serializable {
                 tableColumns.get(i).set(j, " ");
             }
         }
-
-       // for (ArrayList<String> day : tableColumns)
-       // {
-         //   for (String classes : day)
-          //  {
-          //      classes = "  ";
-          //  }
-       // }
     }
 
 
@@ -148,14 +255,13 @@ public class Table implements Serializable {
 
     public void modifyTable(Timetable timetable){
 
-       // tableColumns.
-       // clearTable();
         tableColumns = giveEmptyTable();
+        currentTimetable = timetable;
 
         for(Lesson lesson: timetable.getLessons()){
             String day = lesson.getDay();
-            int from = lesson.getSerialNumberOfStart()+1;
-            int to = lesson.getSerialNumberOfEnd()+1;
+            int from = lesson.getSerialNumberOfStart();
+            int to = lesson.getSerialNumberOfEnd();
             int numOfDay = 0;
             switch(day){
                 case("Po"): numOfDay =1;break;
@@ -172,19 +278,50 @@ public class Table implements Serializable {
         }
     }
 
+    public Lesson getLesson(Integer begining, Integer day){
+        if(currentTimetable != null){
+        for(Lesson l:currentTimetable.getLessons()) {
+            String dayString = l.getDay();
+            Integer dayOfLesson = 0;
+            switch (dayString) {
+                case ("Po"):
+                    dayOfLesson = 1;
+                    break;
+                case ("Ut"):
+                    dayOfLesson = 2;
+                    break;
+                case ("St"):
+                    dayOfLesson = 3;
+                    break;
+                case ("Št"):
+                    dayOfLesson = 4;
+                    break;
+                case ("Pi"):
+                    dayOfLesson = 5;
+                    break;
+            }
+            if (l.getSerialNumberOfStart().equals(begining) && dayOfLesson.equals(day)) {
+                return l;
+            }
+        }
+        }
+        return null;
+    }
+
 
     public void shiftDayBack(){
         if(day == 1)day = 5; else day -= 1;
     }
+
     public void shiftDayForward(){
         if(day == 5)day = 1; else day += 1;
     }
 
     public void createTable(Boolean change, Timetable timetable){
-    //public void createTable(Boolean change){
+
         if(timetable !=null)modifyTable(timetable);
         if(change)changeView();
-        table.removeAllViews();
+        tableLayout.removeAllViews();
         if(onlyDay)dayTable(); else weekTable();
     }
 
@@ -193,14 +330,15 @@ public class Table implements Serializable {
 
     }
 
+
+
+
     private void dayTable() {
 
-        //clearTable();
+        tableLayout.setStretchAllColumns(true);
+        tableLayout.bringToFront();
 
-        table.setStretchAllColumns(true);
-        table.bringToFront();
-
-        tableSwitch.setText("Zobrazit cely tyzden");
+        tableSwitch.setText("Celý týždeň");
         prev.setVisibility(View.VISIBLE);
         next.setVisibility(View.VISIBLE);
 
@@ -213,31 +351,76 @@ public class Table implements Serializable {
             TextView viewTime = new TextView(context);
             viewTime.setText(tableColumns.get(0).get(i));
             viewTime.setTextColor(Color.BLACK);
+            viewTime.setBackgroundColor(Color.GRAY);
             tr.addView(viewTime);
 
-            TextView view = new TextView(context);
+            Lesson current = getLesson(i, day);
 
-            view.setText(tableColumns.get(day).get(i));
+            TextView room = new TextView(context);
+            TextView name = new TextView(context);
 
+            if(current != null){
+
+                room.setText(current.getRoom());
+                room.setBackgroundColor(Color.GRAY);
+                room.setTextColor(Color.BLACK);
+
+
+                name.setText(current.getName());
+                name.setTextColor(Color.BLACK);
+                name.setBackgroundColor(Color.GRAY);
+            }
+
+            if (tableColumns.get(day).get(i).trim().length() > 0){
+                room.setBackgroundColor(Color.GRAY);
+                name.setBackgroundColor(Color.GRAY);
+            }
+            tr.addView(room);
+            tr.addView(name);
+
+            /*
             view.setTextColor(Color.BLACK);
             tr.addView(view);
 
-            if(tableColumns.get(day).get(i) == " "){
-                view.setBackgroundColor(Color.WHITE);
-            }else{
-                view.setBackgroundColor(Color.GREEN);
-            }
 
-            table.addView(tr);
+
+
+            TextView view1 = new TextView(context);
+
+            if(current != null){
+
+                view1 = new TextView(context);
+                view1.setText(current.getRoom());
+                view1.setBackgroundColor(Color.GRAY);
+                view1.setTextColor(Color.BLACK);
+
+
+                view.setText(current.getName());
+                view.setTextColor(Color.BLACK);
+                view.setBackgroundColor(Color.GRAY);
+            }
+            tr.addView(view1);
+            tr.addView(view);
+
+            if (tableColumns.get(day).get(i).trim().length() > 0){
+                view.setBackgroundColor(Color.GRAY);
+            }else{
+                //view.setBackgroundColor(Color.WHITE);
+            }
+            */
+
+            tableLayout.addView(tr);
         }
     }
 
     private void weekTable(){
-        table.setStretchAllColumns(true);
-        table.bringToFront();
+        tableLayout.setStretchAllColumns(true);
+       // tableLayout.matc
+        //tableLayout.set
+        tableLayout.bringToFront();
 
 
-        tableSwitch.setText("Zobrazit iba den");
+        tableSwitch.setText("Zobraziť iba deň");
         prev.setVisibility(View.GONE);
         next.setVisibility(View.GONE);
 
@@ -245,21 +428,36 @@ public class Table implements Serializable {
         for(int i = 0; i<15; i++){
 
             TableRow tr = new TableRow(context);
-            for(ArrayList<String> column: tableColumns){
+            for(int j = 0; j<6;j++){
+            //for(ArrayList<String> column: tableColumns){
 
                 TextView view = new TextView(context);
-
-                view.setText(column.get(i));
-
-                if(column.get(i) == " "){
-                    view.setBackgroundColor(Color.WHITE);
+                if(i == 0){
+                    view.setText(tableColumns.get(j).get(i).substring(0, 2));
                 }else{
-                    view.setBackgroundColor(Color.GREEN);
+                    Lesson current = getLesson(i, j);
+
+                    if(current != null){
+                        view.setText(current.room);
+                    }
+                    if(j == 0){
+                        view.setText(tableColumns.get(j).get(i));
+                    }
+                   //
                 }
+
+                if (tableColumns.get(j).get(i).trim().length() > 0){
+                    view.setBackgroundColor(Color.GRAY);
+                }//else{
+                //    view.setBackgroundColor(Color.WHITE);
+               // }
+                //if(tableColumns.get(j).get(i) == " "){
+                //}else{
+                //}
                 view.setTextColor(Color.BLACK);
                 tr.addView(view);
             }
-            table.addView(tr);
+            tableLayout.addView(tr);
         }
     }
 }

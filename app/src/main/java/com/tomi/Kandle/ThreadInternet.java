@@ -36,7 +36,13 @@ public class ThreadInternet extends Thread {
     private InputStream inputStream = null;
 
     private int len = 2000;
+    private Parser parser;
     private ArrayList<String> htmlCode =  new ArrayList<>();
+
+    public ThreadInternet( Parser parser){
+        this.parser = parser;
+
+    }
 
 
     public void urlSet(String urlString){
@@ -50,9 +56,16 @@ public class ThreadInternet extends Thread {
         }
     };
 
-    /**
-     * Trust every server - dont check for any certificate
-     */
+
+    public String readIt(InputStream stream, int len) throws IOException,
+            UnsupportedEncodingException {
+        Reader reader;
+        reader = new InputStreamReader(stream, "UTF-8");
+        char[] buffer = new char[len];
+        reader.read(buffer);
+        return new String(buffer);
+    }
+
     private static void trustAllHosts() {
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -80,21 +93,8 @@ public class ThreadInternet extends Thread {
         }
     }
 
-    /**
-     * Changing InputStream to string.
-     */
-    public String readIt(InputStream stream, int len) throws IOException,
-            UnsupportedEncodingException {
-        Reader reader;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
-    }
 
-    /**
-     * Return string with data.
-     */
+
 
 
     public ArrayList<String> getDataFromInternet() {
@@ -104,6 +104,8 @@ public class ThreadInternet extends Thread {
     public InputStream getIS(){
         return inputStream;
     }
+
+
 
 
     @Override
@@ -139,6 +141,7 @@ public class ThreadInternet extends Thread {
 
             text = readIt(inputStream, len);
             http.disconnect();
+            parser.returnParsedData(htmlCode);
 
         } catch (Throwable  e) {
            // Log.v("Debug message", "-"+e.toString()+"-");

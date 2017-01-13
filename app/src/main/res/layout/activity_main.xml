@@ -18,11 +18,38 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/linear1">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linear1A">
+
+            <Button
+                android:text="@string/archive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/rychla_volba1" />
+
+            <Button
+                android:text="OK"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/vyhladat" />
+
+        </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linear1A"
+        android:id="@+id/linear1B">
         <Spinner
             android:text="Možnosti"
             android:layout_width="0dp"
@@ -34,51 +61,60 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Center"
+            android:text=""
             android:id="@+id/editText"/>
-
-        <Button
-            android:text="Vyhľadať"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/vyhladat" />
-
     </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"><!--</LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="10px"
-        android:layout_below="@+id/linear1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/linear2">
+    <!-- android:layout_below="@+id/linear1" -->
 
         <Button
-            android:text="Zobraziť celý týždeň"
+            android:text="Späť"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
-            android:onClick="celyTyzden"
-            android:id="@+id/tyzden"/>
+            android:layout_weight="0.33"
+            android:id="@+id/searchMode" />
 
         <Button
-            android:text="Uložit rýchle vyhľadávanie"
+            android:text="Uložiť"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
+            android:layout_weight="0.33"
             android:id="@+id/save"/>
 
 
         <Button
-            android:text="Rýchla voľba"
+            android:text="@string/archive"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
+            android:layout_weight="0.5"
             android:onClick="volbaDialog"
-            android:id="@+id/rychla_volba" />
+            android:id="@+id/rychla_volba2" />
 
     </LinearLayout>
 
@@ -93,47 +129,55 @@
         android:id="@+id/linear3">
 
         <Button
-            android:text="Predchádzajúci deň"
+            android:text="@string/back"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.2"
             android:id="@+id/prev" />
+
         <Button
-            android:text="Nasledujúci deň"
+            android:text="@string/wholeWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.8"
+            android:onClick="celyTyzden"
+            android:id="@+id/tyzden"/>
+
+        <Button
+            android:text="@string/forward"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
             android:id="@+id/next" />
     </LinearLayout>
 
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linear3"
-        android:id="@+id/scrollView">
 
-    <LinearLayout
+
+            <LinearLayout
 
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <HorizontalScrollView
+        <!-- <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent">-->
             <TableLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/linear3"
-                android:id="@+id/mTlayout"></TableLayout>
-        </HorizontalScrollView>
+                android:id="@+id/mTlayout">
+            </TableLayout>
+       <!-- </HorizontalScrollView> -->
 
 
-    </LinearLayout>
-
+            </LinearLayout>
+     </LinearLayout>
 
 
     </ScrollView>
+
+
 
 
 </RelativeLayout>
