@@ -242,7 +242,6 @@ public class Table implements Serializable {
 
         Log.v("clearing", "should be clear");
 
-
         for(int i = 1; i < tableColumns.size(); i++){
             for(int j = 1; j < tableColumns.size(); j++){
                 tableColumns.get(i).set(j, " ");

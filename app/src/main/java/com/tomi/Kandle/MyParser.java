@@ -6,12 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- * Created by Vicko on 11. 1. 2017.
- */
 
 public class MyParser implements Serializable{
 
@@ -30,8 +25,6 @@ public class MyParser implements Serializable{
     public MyParser( Table table){
         this.allTimetables = new ArrayList<>();
         this.table = table;
-      //  this.currentTimetable = new Timetable(type, name);
-
     }
 
     private Boolean parsingNow = false;
@@ -94,13 +87,13 @@ public class MyParser implements Serializable{
     public void draw(boolean change){
         this.table.clearTable();
         this.table.createTable(change, this.currentTimetable);
-        // this.tableLayout.createTable(change);
     }
 
     public String getUrlForFristHtml(){
         return firstUrlString;
     }
 
+    //tato metod sa bude dat prerobit na zobrazovanie predbeznych vysledkov
     public ArrayList<String> returnPossibleChoises(ArrayList<String> linesOfHtml, String type){
 
         ArrayList<String> possiblities = new ArrayList<>();
@@ -111,14 +104,6 @@ public class MyParser implements Serializable{
                 if(line.contains("<li><a href=")){
                     possiblities.add(line.substring(line.indexOf(type+'/')+type.length()+1, line.indexOf("\">")));
                 }
-            }
-        }
-
-        if(possiblities.isEmpty()){
-            Log.v("No choice found", "no choises found");
-        }else{
-            for(String s: possiblities){
-                Log.v("More choises", s);
             }
         }
         return possiblities;
@@ -140,25 +125,12 @@ public class MyParser implements Serializable{
 
         int pos = 8;
         System.out.println(day + " " + from + " - " + to + " " + room + " " + typeOfLecture);
-        Boolean finish = false;
-    /*
-        while (words[pos].length() != 2 && !finish) {
-            if ((words[pos].length() == 2) && (words[pos].charAt(1) == '.')) {
-                break;
-            }
-            nameOfLecture = nameOfLecture.concat(words[pos] + " ");
-            pos++;
-        }
-        */
+
         while (words[pos].charAt(1) != '.') {
-            // if ((words[pos].length() == 2) && (words[pos].charAt(1) == '.')) {
-            Log.v("gggg", ""+words[pos]);
-            //     break;
-            // }
+
             nameOfLecture = nameOfLecture.concat(words[pos] + " ");
             pos++;
         }
-        Log.v("class name", nameOfLecture);
 
         while (pos < words.length - 1) {
             String lecturer = "";
@@ -168,7 +140,6 @@ public class MyParser implements Serializable{
             pos++;
             lecturers.add(lecturer);
 
-            Log.v("lecturer name", lecturer);
         }
         return new Lesson(day, from, to, room, typeOfLecture, nameOfLecture, lecturers);
     }
@@ -189,22 +160,14 @@ public class MyParser implements Serializable{
                 if(line.contains("Rozvrh - Rozvrh")){
                     haveSomethingToSave = false;
                     morePossiblities = true;
-                    //TODO Look at this
-                   // returnPossibleChoises(htmlString, type);
                     return;
                 }else{
-                    //TODO NEDED ??????????????
                     urlForTxt = getUrl(htmlString, type);
-                   // tableLayout.clearTable();
-                   // currentTimetable = getTimetable(htmlString, name, type);
-                    //tableLayout.modifyTable(currentTimetable);morePossiblities
-
                     morePossiblities = false;
                     haveSomethingToSave = true;
                 }
             }
         }
-        //return htmlString;
     }
 
 
@@ -215,8 +178,6 @@ public class MyParser implements Serializable{
 
         while ((ln=bufferedReader.readLine()) != null) {
 
-System.out.println(ln);
-
             htmlString.add(ln);
         }
             currentTimetable = new Timetable(name, type);
@@ -224,7 +185,6 @@ System.out.println(ln);
 
             currentTimetable.addToTable(parseLineOfText(lineTextOfLecture));
         }
-        //return currentTimetable;
         saveTable();
 
         table.modifyTable(currentTimetable);
@@ -232,17 +192,14 @@ System.out.println(ln);
 
 
     public String getUrl(ArrayList<String> linesOfHtml, String type){
-Log.v("type in getUrl", type);
+
         for(String line: linesOfHtml){
             if(line.contains("/rozvrh/duplikovat")){
                 name = line.substring(line.indexOf(type+'/')+type.length()+1, line.indexOf("/rozvrh/duplikovat"));
-System.out.println("name is:" +name);
-               // currentTimetable.setName(name);
-Log.v("name in getUrl", name);
+
                 urlForTxt = "https://candle.fmph.uniba.sk/"+type+"/"+name+".txt";
             }
         }
-Log.v("url for txt", urlForTxt);
         return urlForTxt;
     }
 
@@ -275,7 +232,7 @@ Log.v("url for txt", urlForTxt);
             if(table.getName().equals(currentTimetable.getName())) haveSomethingToSave = false;
         }
         if(haveSomethingToSave){
-            //currentTimetable.setName(name);
+
             allTimetables.add(currentTimetable);
         }
     }

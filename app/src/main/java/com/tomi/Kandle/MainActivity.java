@@ -16,20 +16,20 @@ import android.widget.Spinner;
 import android.view.View;
 import android.widget.TableLayout;
 import android.content.Intent;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    //deklaracia Buttonov ktore pouzije aplikacia
     Spinner moznosti_spinner;
     EditText searchText;
     Button buttonSearch;
-
     ListView rychla_volba;
-    Button buttonVolbaDialog1;
-    Button buttonVolbaDialog2;
+    Button archiv1;
+    Button archiv2;
     Button tableSwitch;
     Button buttonPrevious;
     Button buttonNext;
@@ -38,23 +38,23 @@ public class MainActivity extends AppCompatActivity {
 
     Button buttonSave;
 
+    //trieda Table sa stara o kreslenie tabulky
+    static Table table;
 
     Context context;
-
-    //TODO make save load
     TableLayout layout;
-    static Table table;
     MyParser parser;
     MyThread thread;
 
+    //testuje pripojenie
     public Boolean amIConnectedToInternet() {
         ConnectivityManager connMgr = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
+        return (networkInfo != null && networkInfo.isConnected() );
     }
 
-
+    //uklada informacie, lebo sa pri zmene orientacii vymazu...
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
 
@@ -77,15 +77,11 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         parser = ((MyParser)savedInstanceState.getSerializable("myParser"));
        // if(parser != null && table != null) {
-
-
             parser.setAllTimetables((ArrayList<Timetable>) savedInstanceState.getSerializable("allTables"));
             parser.getTable().setWholeTable((ArrayList<ArrayList<String>>)savedInstanceState.getSerializable("currentTable"));
             parser.setCurrentTimetable((Timetable) savedInstanceState.getSerializable("tableLayout"));
             parser.getTable().setOnlyDay(savedInstanceState.getBoolean("onlyDay"));
-
             parser.getTable().setday(savedInstanceState.getInt("id"));
-
 
             table.setSearchMode(!savedInstanceState.getBoolean("searchMode"));
             table.hideButtons();
@@ -103,8 +99,9 @@ public class MainActivity extends AppCompatActivity {
         rychla_volba = new ListView(this);
         layout = (TableLayout)findViewById(R.id.mTlayout);
 
-        buttonVolbaDialog1 = (Button) findViewById(R.id.rychla_volba1);
-        buttonVolbaDialog2 = (Button) findViewById(R.id.rychla_volba2);
+        archiv1 = (Button) findViewById(R.id.rychla_volba1);
+        archiv2 = (Button) findViewById(R.id.rychla_volba2);
+
         buttonSearch = (Button) findViewById(R.id.vyhladat);
         buttonPrevious = (Button) findViewById(R.id.prev);
         buttonNext = (Button) findViewById(R.id.next);
@@ -115,11 +112,9 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-       // tableLayout = new Table(layout, context, tableSwitch, buttonPrevious, buttonNext);
         table = new Table(this);
         table.hideButtons();
         parser = new MyParser(table);
-       // thread = new MyThread(parser);
         parser.draw(false);
 
 
@@ -128,48 +123,37 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-
                 table.hideButtons();
-
             }
         });
 
 
-
-        buttonVolbaDialog1.setOnClickListener(new Button.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                Intent myIntent = new Intent(MainActivity.this,
-                        ListViewCheckboxesActivity.class);
-                myIntent.putExtra("myJoinedTable", parser.giveAllTimetables());
-                startActivityForResult(myIntent, 3);
-            }
-        });
-
-        buttonVolbaDialog2.setOnClickListener(new Button.OnClickListener() {
+        archiv1.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
 
                 Intent myIntent = new Intent(MainActivity.this,
                         ListViewCheckboxesActivity.class);
+
                 myIntent.putExtra("myJoinedTable", parser.giveAllTimetables());
-                //setResult(RESULT_OK, myIntent);
-
                 startActivityForResult(myIntent, 3);
-
             }
         });
 
+        archiv2.setOnClickListener(new Button.OnClickListener() {
 
+            @Override
+            public void onClick(View arg0) {
 
+                Intent myIntent = new Intent(MainActivity.this,
+                        ListViewCheckboxesActivity.class);
 
+                myIntent.putExtra("myJoinedTable", parser.giveAllTimetables());
+                startActivityForResult(myIntent, 3);
+            }
+        });
 
-
-
-
-        //TODO finish this
 
         searchText   = (EditText)findViewById(R.id.editText);
 
@@ -182,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 String result = moznosti_spinner.getSelectedItem().toString();
                 String searchName = searchText.getText().toString();
                 table.hideButtons();
-                
+
                 if(amIConnectedToInternet()){
                     Log.v("connecttion: ", "ok");
                     parser.setData(result, searchName);
@@ -190,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
                     thread.start();
 
                 }else{
+                    Toast.makeText(getApplicationContext(),
+                            "no connection",
+                            Toast.LENGTH_SHORT).show();
                     Log.v("connection", "problem");
                 }
             }
@@ -206,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         buttonNext.setOnClickListener(new Button.OnClickListener() {
 
             @Override
@@ -215,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
                 parser.draw(false);
             }
         });
-
 
         tableSwitch.setOnClickListener(new Button.OnClickListener() {
 
@@ -264,16 +249,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-      //  Log.v("??????", "can i get through???????????");
-      //  Log.v("data", "requestcode: "+requestCode+" resultCode: "+ resultCode);
 
         if (requestCode == 3 && resultCode == RESULT_OK && data != null) {
 
-           // Log.v("hahahah", "got hereeeee");
-
             parser.setAllTimetables((ArrayList<Timetable>) data.getExtras().getSerializable("myJoinedTable"));
             int id = data.getExtras().getInt("selected");
-            Log.v("id arrived", " "+id);
             if(id != -1){
                 parser.setCurrentTimetable(parser.getConcreteTimetable(id));
                 if(table.isSearchMode()){

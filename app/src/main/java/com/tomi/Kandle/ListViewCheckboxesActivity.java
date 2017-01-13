@@ -20,10 +20,12 @@ package com.tomi.Kandle;
         import android.widget.Toast;
         import android.widget.AdapterView.OnItemClickListener;
 
+//tato trieda zobrazuje archiv ulozenych dat
 public class ListViewCheckboxesActivity extends Activity {
 
     MyCustomAdapter dataAdapter = null;
-    ArrayList<Timetable> joinedTable = new ArrayList<>();
+    ArrayList<Timetable> tableOfSaves = new ArrayList<>();
+    Button deleteButton;
 
     int id = -1;
     Intent myIntent;
@@ -34,24 +36,21 @@ public class ListViewCheckboxesActivity extends Activity {
         setContentView(R.layout.dialoglayout);
 
          myIntent = new Intent(ListViewCheckboxesActivity.this, MainActivity.class);
-        joinedTable = (ArrayList<Timetable>)getIntent().getSerializableExtra("myJoinedTable");
+        tableOfSaves = (ArrayList<Timetable>)getIntent().getSerializableExtra("myJoinedTable");
         setResult(RESULT_OK, myIntent);
-
 
         displayListView();
 
         checkButtonClick();
 
-        //TODO send modified data back
-
-        myIntent.putExtra("myJoinedTable", joinedTable);
+        myIntent.putExtra("myJoinedTable", tableOfSaves);
         myIntent.putExtra("selected", id);
     }
 
     private void displayListView() {
 
         dataAdapter = new MyCustomAdapter(this,
-                R.layout.rychla_volba, joinedTable);
+                R.layout.rychla_volba, tableOfSaves);
         ListView listView = (ListView) findViewById(R.id.listView1);
         listView.setAdapter(dataAdapter);
 
@@ -60,15 +59,13 @@ public class ListViewCheckboxesActivity extends Activity {
                                     int position, long id) {
 
                 Timetable timetable = (Timetable) parent.getItemAtPosition(position);
-                int idOfTable = joinedTable.indexOf(timetable);
+                int idOfTable = tableOfSaves.indexOf(timetable);
                 myIntent.putExtra("id", ListViewCheckboxesActivity.this.id);
                 Toast.makeText(getApplicationContext(),
                         "Clicked on Row: " + timetable.getName(),
                         Toast.LENGTH_LONG).show();
 
                 myIntent.putExtra("selected", idOfTable);
-
-                Log.v("control", "pressed textview, id: "+id+" text: "+timetable.getName());
 
                 finish();
             }
@@ -116,15 +113,15 @@ public class ListViewCheckboxesActivity extends Activity {
                                         " inputStream " + cb.isChecked(),
                                 Toast.LENGTH_LONG).show();
                        // if(table.is)
-                        Log.v("selected timetable", country.getName() + " index of country: " + joinedTable.indexOf(country));
-                        joinedTable.get(joinedTable.indexOf(country)).check(cb.isChecked());
+                        Log.v("selected timetable", country.getName() + " index of country: " + tableOfSaves.indexOf(country));
+                        tableOfSaves.get(tableOfSaves.indexOf(country)).check(cb.isChecked());
                     }
                 });
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            Timetable timetable = joinedTable.get(position);
+            Timetable timetable = tableOfSaves.get(position);
             holder.code.setText(" ("+timetable.getType()+") ");
             holder.name.setText(timetable.getName());
             holder.name.setTag(timetable);
@@ -136,8 +133,8 @@ public class ListViewCheckboxesActivity extends Activity {
     private void checkButtonClick() {
 
 
-        Button myButton = (Button) findViewById(R.id.deleteSelected);
-        myButton.setOnClickListener(new OnClickListener() {
+        deleteButton = (Button) findViewById(R.id.deleteSelected);
+        deleteButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -145,20 +142,17 @@ public class ListViewCheckboxesActivity extends Activity {
                 StringBuffer responseText = new StringBuffer();
                 responseText.append("Vymazali ste nasledujuce rozvrhy...\n");
 
-                ArrayList<Timetable> countryList = dataAdapter.tableList;
-
-                    for(int j = 0; j< joinedTable.size(); j++){
-                        if(joinedTable.get(j).checked){
-                            joinedTable.remove(joinedTable.get(j));
+                    for(int j = 0; j< tableOfSaves.size(); j++){
+                        if(tableOfSaves.get(j).checked){
+                            tableOfSaves.remove(tableOfSaves.get(j));
                         }
                     }
 
-                myIntent.putExtra("myJoinedTable", joinedTable);
+                myIntent.putExtra("myJoinedTable", tableOfSaves);
 
                 Toast.makeText(getApplicationContext(),
                         responseText, Toast.LENGTH_LONG).show();
                 dataAdapter.notifyDataSetChanged();
-           // }
         }
     });
     }

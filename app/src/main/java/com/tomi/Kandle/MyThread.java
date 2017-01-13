@@ -1,6 +1,5 @@
 package com.tomi.Kandle;
 
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -20,15 +19,12 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * Created by Vicko on 11. 1. 2017.
- */
 
 public class MyThread extends Thread {
 
 
 
-    MyParser myParser;  //= new MyParser();
+    MyParser myParser;
 
     BufferedReader bufferedReader;
 
@@ -43,24 +39,6 @@ public class MyThread extends Thread {
     private HttpsURLConnection http = null;
     private InputStream inputStream = null;
 
-/*
-//TODO have to use this to initialise data
-    public void setData(String type, String name){
-        String searchType;
-        this.name = name;
-        this.type = type;
-
-        switch(type){
-
-            case("ucitelia"): searchType = "showTeachers"; break;
-            case("miestnosti"):searchType = "showRooms"; break;
-            default: System.out.println("wrong type, can not add to parse HTML"); searchType = "";
-
-        }
-
-            urlString = "https://candle.fmph.uniba.sk/?"+searchType+"="+name;
-    }
-    */
 
     final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {
@@ -97,9 +75,6 @@ public class MyThread extends Thread {
     }
 
 
-
-
-
     @Override
     public void run() {
 
@@ -119,18 +94,14 @@ public class MyThread extends Thread {
 
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-          // ArrayList<String> lineOfHtml =  myParser.parsehtml(bufferedReader);
             myParser.parsehtml(bufferedReader);
             http.disconnect();
 
-           // parser.returnParsedData(htmlCode);
 
             if(myParser.moreResults()){
 
-               // myParser.returnPossibleChoises(lineOfHtml, type);
 
             }else{
-               // String newUrlForTxt = ;
 
                 urlString =  new URL(myParser.getUrlForTxt());
                 http = (HttpsURLConnection) urlString
@@ -143,7 +114,7 @@ public class MyThread extends Thread {
             }
 
         } catch (Throwable  e) {
-           // text = Integer.toString(-1);
+            e.printStackTrace();
         }
     }
 }
