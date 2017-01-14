@@ -185,7 +185,7 @@ public class MyParser implements Serializable{
 
             currentTimetable.addToTable(parseLineOfText(lineTextOfLecture));
         }
-        saveTable();
+        //saveTable();
 
         table.modifyTable(currentTimetable);
     }

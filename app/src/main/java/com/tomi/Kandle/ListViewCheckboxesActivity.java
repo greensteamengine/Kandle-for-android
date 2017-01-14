@@ -110,7 +110,7 @@ public class ListViewCheckboxesActivity extends Activity {
                         Timetable country = (Timetable) cb.getTag();
                         Toast.makeText(getApplicationContext(),
                                 "Clicked on Checkbox: " + cb.getText() +
-                                        " inputStream " + cb.isChecked(),
+                                        " " + cb.isChecked(),
                                 Toast.LENGTH_LONG).show();
                        // if(table.is)
                         Log.v("selected timetable", country.getName() + " index of country: " + tableOfSaves.indexOf(country));
@@ -120,11 +120,13 @@ public class ListViewCheckboxesActivity extends Activity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+            if(!tableOfSaves.isEmpty()){
+                Timetable timetable = tableOfSaves.get(position);
+                holder.code.setText(" ("+timetable.getType()+") ");
+                holder.name.setText(timetable.getName());
+                holder.name.setTag(timetable);
+            }
 
-            Timetable timetable = tableOfSaves.get(position);
-            holder.code.setText(" ("+timetable.getType()+") ");
-            holder.name.setText(timetable.getName());
-            holder.name.setTag(timetable);
 
             return convertView;
         }
@@ -141,12 +143,22 @@ public class ListViewCheckboxesActivity extends Activity {
 
                 StringBuffer responseText = new StringBuffer();
                 responseText.append("Vymazali ste nasledujuce rozvrhy...\n");
-
+                ArrayList<Timetable> tmp = new ArrayList<>();
                     for(int j = 0; j< tableOfSaves.size(); j++){
-                        if(tableOfSaves.get(j).checked){
-                            tableOfSaves.remove(tableOfSaves.get(j));
+                        if(!tableOfSaves.get(j).checked){
+                            tmp.add(tableOfSaves.get(j));
+
+                            //tableOfSaves.remove(tableOfSaves.get(j));
+                        }else{
+                            dataAdapter.remove(tableOfSaves.get(j));
+                            responseText.append(tableOfSaves.get(j).nameOfTable);
+
                         }
                     }
+                tableOfSaves = tmp;
+                dataAdapter.clear();
+                dataAdapter.addAll(tmp);//= tmp;
+                dataAdapter.notifyDataSetChanged();
 
                 myIntent.putExtra("myJoinedTable", tableOfSaves);
 
