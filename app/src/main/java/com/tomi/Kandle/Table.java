@@ -209,7 +209,7 @@ public class Table implements Serializable {
         ArrayList<ArrayList<String>> newtTable = new ArrayList<ArrayList<String>>();
 
         ArrayList<String> timesOfClasses = new ArrayList<String>(Arrays.asList(
-                "...", "  8:10", "  9:00", " 9:50", "10:40", "11:30", "12:20",
+                "...", "  8:10", "  9:00", "  9:50", "10:40", "11:30", "12:20",
                 "13:10", "14:00", "14:50", "15:40", "16:30", "17:20", "18:10", "19:00"));
         ArrayList<String> Monday = new ArrayList<String>(Arrays.asList("Pondelok"));
         ArrayList<String> Thuesday = new ArrayList<String>(Arrays.asList("Utorok"));
@@ -343,9 +343,24 @@ public class Table implements Serializable {
 
 
         if (day < 1 || day > 5) day = 1;
-        for (int i = 0; i < 15; i++) {
 
-            TableRow tr = new TableRow(context);
+        TableRow tr = new TableRow(context);
+
+        TextView viewEdge = new TextView(context);
+        viewEdge.setText(tableColumns.get(0).get(0));
+        viewEdge.setTextColor(Color.BLACK);
+        viewEdge.setBackgroundColor(Color.GRAY);
+        tr.addView(viewEdge);
+
+        TextView viewDay = new TextView(context);
+        viewDay.setText(tableColumns.get(day).get(0));
+        viewDay.setTextColor(Color.BLACK);
+        viewDay.setBackgroundColor(Color.GRAY);
+        tr.addView(viewDay);
+        tableLayout.addView(tr);
+        for (int i = 1; i < 15; i++) {
+
+            tr = new TableRow(context);
 
             TextView viewTime = new TextView(context);
             viewTime.setText(tableColumns.get(0).get(i));
@@ -377,45 +392,13 @@ public class Table implements Serializable {
             tr.addView(room);
             tr.addView(name);
 
-            /*
-            view.setTextColor(Color.BLACK);
-            tr.addView(view);
-
-
-
-
-            TextView view1 = new TextView(context);
-
-            if(current != null){
-
-                view1 = new TextView(context);
-                view1.setText(current.getRoom());
-                view1.setBackgroundColor(Color.GRAY);
-                view1.setTextColor(Color.BLACK);
-
-
-                view.setText(current.getName());
-                view.setTextColor(Color.BLACK);
-                view.setBackgroundColor(Color.GRAY);
-            }
-            tr.addView(view1);
-            tr.addView(view);
-
-            if (tableColumns.get(day).get(i).trim().length() > 0){
-                view.setBackgroundColor(Color.GRAY);
-            }else{
-                //view.setBackgroundColor(Color.WHITE);
-            }
-            */
-
             tableLayout.addView(tr);
         }
     }
 
     private void weekTable(){
         tableLayout.setStretchAllColumns(true);
-       // tableLayout.matc
-        //tableLayout.set
+
         tableLayout.bringToFront();
 
 
