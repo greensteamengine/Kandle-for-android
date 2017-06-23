@@ -1,14 +1,18 @@
 package com.tomi.Kandle;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -127,8 +131,12 @@ public class MainActivity extends AppCompatActivity {
     }
     */
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
 
         //bugged autoCompleteTextView hint color - trying to fix based on
         // https://issuetracker.google.com/issues/36911171#c8
@@ -216,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
 
         searchText.setOnClickListener(new Button.OnClickListener() {
 
-            @Override
+
+
             public void onClick(View arg0) {
                 ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(MainActivity.super.getApplication(),
                         android.R.layout.simple_dropdown_item_1line, possibleChoices);
@@ -225,8 +234,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //List<String> arrayList = new ArrayList<>(); // this will be your arraylist
                 LinkedHashSet<String> linkedHashSet = new LinkedHashSet<>();
-                //searchText.setHintTextColor(Color.BLACK);
-                searchText.setHintTextColor(Color.BLUE);
+                searchText.setHintTextColor(Color.BLACK);
+                //searchText.setHintTextColor(Color.BLUE);
+
+
+
 
                 linkedHashSet.addAll(possibleChoices);
                 possibleChoices.clear();
@@ -242,6 +254,34 @@ public class MainActivity extends AppCompatActivity {
                 }
                 searchText.showDropDown();
                 Log.v("num of items", String.valueOf(adapter2.getCount()));
+
+            }
+        });
+
+
+
+
+        searchText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onItemClick(AdapterView<?> av, View arg1, int index,
+                                    long arg3) {
+                String nameOfChoice = av.getItemAtPosition(index).toString();
+                Log.v("clicked", nameOfChoice );
+
+                String result = moznosti_spinner.getSelectedItem().toString();
+
+                    parser.setData(result, nameOfChoice);
+
+                ConcreteNameThread concreteThread = new ConcreteNameThread(parser);
+                concreteThread.start();
+                //Toast.makeText(getActivity(), "auto", Toast.LENGTH_LONG).show();
+               // Map<String, String> map = (Map<String, String>) av.getItemAtPosition(index);
+
+               // String name  = map.get("Name");
+               // String number = map.get("Phone");
+               // atvPlaces.setText(""+name+"<"+number+">");
 
             }
         });

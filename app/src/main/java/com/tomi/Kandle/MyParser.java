@@ -67,6 +67,13 @@ public class MyParser implements Serializable{
         this.allTimetables = allTimetables;
     }
 
+    public String getConcreteUrl(){
+
+        String url = "https://candle.fmph.uniba.sk/"+type+"/"+name+".txt";
+
+        return url;
+    }
+
     public Timetable getCurrentTimetable(){
         return currentTimetable;
     }
@@ -139,7 +146,7 @@ public class MyParser implements Serializable{
         int pos = 8;
         System.out.println(day + " " + from + " - " + to + " " + room + " " + typeOfLecture);
 
-        while (words[pos].length() != 2 || words[pos].charAt(1) != '.') {
+        while (words[pos].charAt(0) != '.' && (words[pos].length() != 2 && words[pos].charAt(1) != '.')) {
 
             nameOfLecture = nameOfLecture.concat(words[pos] + " ");
             pos++;
@@ -157,7 +164,7 @@ public class MyParser implements Serializable{
         return new Lesson(day, from, to, room, typeOfLecture, nameOfLecture, lecturers);
     }
 
-    public ArrayList<String> getStingsFromBuffer(BufferedReader bufferedReader) throws IOException{
+    public ArrayList<String> getStringsFromBuffer(BufferedReader bufferedReader) throws IOException{
         ArrayList<String> htmlString  = new ArrayList<>();
         String ln;
 
