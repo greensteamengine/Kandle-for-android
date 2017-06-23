@@ -32,6 +32,8 @@ public class Parser implements Serializable{
 
     }
 
+
+
     public Timetable getConcreteTimetable(int index){
         return allTimetables.get(index);
     }
@@ -70,7 +72,7 @@ public class Parser implements Serializable{
 
 
     /*
-    when mor possiblities, then get them all and show
+    when more possibilities, then get them all and show
     TODO show menu for choosing possiblities...
      */
     public void printPossibleChoises(ArrayList<String> linesOfHtml, String type){

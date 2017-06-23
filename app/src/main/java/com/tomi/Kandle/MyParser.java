@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public class MyParser implements Serializable{
 
     boolean morePossiblities;
 
-    ArrayList<String> htmlString;
+    //ArrayList<String> htmlString;
 
 
     public void setData(String type, String name){
@@ -51,6 +52,10 @@ public class MyParser implements Serializable{
         }
 
         firstUrlString = "https://candle.fmph.uniba.sk/?"+searchType+"="+name;
+    }
+
+    public void hideButtons(){
+        table.hideButtons();
     }
 
 
@@ -94,16 +99,24 @@ public class MyParser implements Serializable{
     }
 
     //tato metod sa bude dat prerobit na zobrazovanie predbeznych vysledkov
-    public ArrayList<String> returnPossibleChoises(ArrayList<String> linesOfHtml, String type){
+    //public ArrayList<String> returnPossibleChoises(ArrayList<String> linesOfHtml, String type){
+    //method needs html code in bufferreader
+    public ArrayList<String> returnPossibleChoises(ArrayList<String> htmlStrings) throws IOException {
 
         ArrayList<String> possiblities = new ArrayList<>();
 
-        for(String line: linesOfHtml){
-            if(line.contains("<ul class=\"vysledky_hladania\">")){
-                if(line.contains("</ul>")) break;
-                if(line.contains("<li><a href=")){
-                    possiblities.add(line.substring(line.indexOf(type+'/')+type.length()+1, line.indexOf("\">")));
-                }
+        //htmlString = getStingsFromBuffer(bufferedReader);
+        boolean go = false;
+        for(String line: htmlStrings){
+            //Log.v("htmlString", line);
+            if(line.contains("<ul class=\"vysledky_hladania\">")) {
+                go = true;
+            }
+            if(line.contains("</ul>")) break;
+            if(line.contains("<li><a href=") && go){
+                String posib = line.substring(line.indexOf(type+'/')+type.length()+1, line.indexOf("\">"));
+                possiblities.add(posib);
+                Log.v("pssibility", posib);
             }
         }
         return possiblities;
@@ -126,7 +139,7 @@ public class MyParser implements Serializable{
         int pos = 8;
         System.out.println(day + " " + from + " - " + to + " " + room + " " + typeOfLecture);
 
-        while (words[pos].charAt(1) != '.') {
+        while (words[pos].length() != 2 || words[pos].charAt(1) != '.') {
 
             nameOfLecture = nameOfLecture.concat(words[pos] + " ");
             pos++;
@@ -144,17 +157,31 @@ public class MyParser implements Serializable{
         return new Lesson(day, from, to, room, typeOfLecture, nameOfLecture, lecturers);
     }
 
-
-
-    public void parsehtml(BufferedReader bufferedReader) throws IOException {
-        htmlString  = new ArrayList<>();
+    public ArrayList<String> getStingsFromBuffer(BufferedReader bufferedReader) throws IOException{
+        ArrayList<String> htmlString  = new ArrayList<>();
         String ln;
 
         while ((ln=bufferedReader.readLine()) != null) {
             htmlString.add(ln);
         }
+        return htmlString;
+    }
 
-        for(String line: htmlString){
+    public void expandAutoComplete(ArrayList<String> htmlStrings) throws IOException {
+
+        Log.v("myParser","returnPossibleChoises");
+
+        ArrayList<String> possiblities = returnPossibleChoises(htmlStrings);
+        table.modifyAutoComplete(possiblities);
+
+
+    }
+
+    public void parsehtml(ArrayList<String> htmlStrings) throws IOException {
+       // htmlString  = new ArrayList<>();
+        //htmlString = getStingsFromBuffer(bufferedReader);
+
+        for(String line: htmlStrings){
 
             if(line.contains("<title>")){
                 if(line.contains("Rozvrh - Rozvrh")){
@@ -162,7 +189,7 @@ public class MyParser implements Serializable{
                     morePossiblities = true;
                     return;
                 }else{
-                    urlForTxt = getUrl(htmlString, type);
+                    urlForTxt = getUrl(htmlStrings, type);
                     morePossiblities = false;
                     haveSomethingToSave = true;
                 }
@@ -172,17 +199,18 @@ public class MyParser implements Serializable{
 
 
 
-    public void parsetxt(BufferedReader bufferedReader) throws IOException {
-        htmlString  = new ArrayList<>();
-        String ln;
+    //public void parsetxt(BufferedReader bufferedReader) throws IOException {
+    public void parsetxt(ArrayList<String> htmlStrings) throws IOException {
+       // htmlString  = htmlStrings;
+        //String ln;
 
-        while ((ln=bufferedReader.readLine()) != null) {
+       // while ((ln=bufferedReader.readLine()) != null) {
 
-            htmlString.add(ln);
-        }
+        //    htmlString.add(ln);
+        //}
             currentTimetable = new Timetable(name, type);
-        for(String lineTextOfLecture: htmlString){
-
+        for(String lineTextOfLecture: htmlStrings){
+            Log.v("line",lineTextOfLecture);
             currentTimetable.addToTable(parseLineOfText(lineTextOfLecture));
         }
         //saveTable();
@@ -236,5 +264,6 @@ public class MyParser implements Serializable{
             allTimetables.add(currentTimetable);
         }
     }
+
 
 }

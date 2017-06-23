@@ -2,6 +2,7 @@ package com.tomi.Kandle;
 
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -11,6 +12,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import android.util.Log;
+import android.widget.AutoCompleteTextView;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -18,6 +21,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import static com.tomi.Kandle.MainActivity.*;
 
 
 public class MyThread extends Thread {
@@ -74,6 +79,16 @@ public class MyThread extends Thread {
         }
     }
 
+    public ArrayList<String> getStingsFromBuffer(BufferedReader bufferedReader) throws IOException {
+        ArrayList<String> htmlString  = new ArrayList<>();
+        String ln;
+
+        while ((ln=bufferedReader.readLine()) != null) {
+            htmlString.add(ln);
+        }
+        return htmlString;
+    }
+
 
     @Override
     public void run() {
@@ -94,14 +109,28 @@ public class MyThread extends Thread {
 
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-            myParser.parsehtml(bufferedReader);
+            ArrayList<String> htmlString =  getStingsFromBuffer(bufferedReader);
+
+            myParser.parsehtml(htmlString);
             http.disconnect();
 
 
             if(myParser.moreResults()){
+                Log.v("myThread","MORE POSSIBILITIES");
+
+                //ArrayList<String> possiblities = myParser.returnPossibleChoises(bufferedReader);
+                //AutoCompleteTextView searchText;
+                //textView.setAdapter(adapter);
+
+                //ArrayAdapter<String> adapter = textView.getAdapter()
+
+                                      myParser.expandAutoComplete(htmlString);
+
+
 
 
             }else{
+                table.hideShow();
 
                 urlString =  new URL(myParser.getUrlForTxt());
                 http = (HttpsURLConnection) urlString
@@ -110,11 +139,19 @@ public class MyThread extends Thread {
                 http.connect();
                 inputStream = http.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                myParser.parsetxt(bufferedReader);
+                htmlString =  getStingsFromBuffer(bufferedReader);
+                myParser.parsetxt(htmlString);
+
+                //myParser.hideButtons();
+
+
+
             }
 
         } catch (Throwable  e) {
             e.printStackTrace();
         }
     }
+
+
 }

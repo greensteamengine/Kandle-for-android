@@ -1,6 +1,7 @@
 package com.tomi.Kandle;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.ActionBar;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -20,12 +22,18 @@ import android.widget.Toast;
 
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+
+import android.os.Handler;
+
 
 public class MainActivity extends AppCompatActivity {
 
     //deklaracia Buttonov ktore pouzije aplikacia
     Spinner moznosti_spinner;
-    EditText searchText;
+    //EditText searchText;
+    AutoCompleteTextView searchText;
     Button buttonSearch;
     ListView rychla_volba;
     Button archiv1;
@@ -35,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     Button buttonNext;
     Button searchMode;
 
+    //Handler mainHandler = new Handler(this.getMainLooper());
 
     Button buttonSave;
 
@@ -45,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     TableLayout layout;
     MyParser parser;
     MyThread thread;
+
+    static final ArrayList<String> possibleChoices = new ArrayList<String>();
 
     //testuje pripojenie
     public Boolean amIConnectedToInternet() {
@@ -58,7 +69,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
 
+        SaveLoad.saveState(savedInstanceState, parser, table);
+
        // if(parser != null && table != null){
+        /*
             savedInstanceState.putSerializable("myParser", parser);
 
             savedInstanceState.putSerializable("allTables", parser.giveAllTimetables());
@@ -68,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             savedInstanceState.putInt("id", parser.getTable().getDay());
 
             savedInstanceState.putBoolean("searchMode", table.isSearchMode());
+            */
 
        // }
         super.onSaveInstanceState(savedInstanceState);
@@ -75,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        SaveLoad.loadState(savedInstanceState, parser, table);
+        /*
         parser = ((MyParser)savedInstanceState.getSerializable("myParser"));
        // if(parser != null && table != null) {
             parser.setAllTimetables((ArrayList<Timetable>) savedInstanceState.getSerializable("allTables"));
@@ -86,14 +103,40 @@ public class MainActivity extends AppCompatActivity {
             table.setSearchMode(!savedInstanceState.getBoolean("searchMode"));
             table.hideButtons();
             parser.draw(false);
+        */
        // }
     }
+    /*
+    @Override
+    protected void onStop(){
+        super.onStop();
+        SaveLoad.saveData(context, parser, table);
+    }
+
+    @Override
+    public void onResume() {
+        super.onStart();
+        MyParser mp = SaveLoad.loadParser(context);
+        if(mp!=null){
+            parser = mp;
+        }
+        Table tab = SaveLoad.loadTable(context);
+        if(tab!=null){
+            table = tab;
+        }
+    }
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //bugged autoCompleteTextView hint color - trying to fix based on
+        // https://issuetracker.google.com/issues/36911171#c8
         super.onCreate(savedInstanceState);
+
+        //searchText.setHintTextColor(Color.BLACK);
         setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
         rychla_volba = new ListView(this);
@@ -113,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.hide();
 
         table = new Table(this);
+        table.setCoices(possibleChoices);
         table.hideButtons();
         parser = new MyParser(table);
         parser.draw(false);
@@ -155,7 +199,52 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        searchText   = (EditText)findViewById(R.id.editText);
+        searchText   = (AutoCompleteTextView)findViewById(R.id.editText);
+        //final ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_dropdown_item_1line, possibleChoices);
+        //searchText.setAdapter(adapter2);
+
+        //ArrayAdapter<String> adapter = (ArrayAdapter<String>)searchText.getAdapter();
+        //adapter.clear();
+
+        //
+        //adapter.addAll(possiblities);
+        //for(String pos: possiblities){
+        //    adapter.add(pos);
+        //    Log.v("added posibility",pos);
+        //}
+
+        searchText.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(MainActivity.super.getApplication(),
+                        android.R.layout.simple_dropdown_item_1line, possibleChoices);
+                //adapter2.clear();
+
+
+                //List<String> arrayList = new ArrayList<>(); // this will be your arraylist
+                LinkedHashSet<String> linkedHashSet = new LinkedHashSet<>();
+                //searchText.setHintTextColor(Color.BLACK);
+                searchText.setHintTextColor(Color.BLUE);
+
+                linkedHashSet.addAll(possibleChoices);
+                possibleChoices.clear();
+                possibleChoices.addAll(linkedHashSet);
+
+               // adapter2.addAll(possibleChoices);
+
+                searchText.setAdapter(adapter2);
+                Log.v("reamining choices","it comes here");
+                for(String pos: possibleChoices){
+                    //     adapter.add(pos);
+                    Log.v("still left",pos);
+                }
+                searchText.showDropDown();
+                Log.v("num of items", String.valueOf(adapter2.getCount()));
+
+            }
+        });
 
         buttonSearch.setOnClickListener(new Button.OnClickListener() {
 
@@ -165,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 moznosti_spinner = (Spinner) findViewById(R.id.moznosti_spinner);
                 String result = moznosti_spinner.getSelectedItem().toString();
                 String searchName = searchText.getText().toString();
-                table.hideButtons();
+                //table.hideButtons();
 
                 if(amIConnectedToInternet()){
                     Log.v("connecttion: ", "ok");

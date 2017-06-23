@@ -59,11 +59,35 @@ class Lesson implements Serializable {
                 return from;
     }
 
+
+
     public int getSerialNumberOfEnd(){
         String[] times =  to.split(":");
         Integer to;
         to = (((Integer.parseInt(times[0])*60 + Integer.parseInt(times[1]))-490)/50)+1;
         Log.v("to", day+to.toString());
         return to;
+    }
+
+    public int getDayOfLesson(){
+        Integer dayOfLesson = 0;
+        switch (day) {
+            case ("Po"):
+                dayOfLesson = 1;
+                break;
+            case ("Ut"):
+                dayOfLesson = 2;
+                break;
+            case ("St"):
+                dayOfLesson = 3;
+                break;
+            case ("Št"):
+                dayOfLesson = 4;
+                break;
+            case ("Pi"):
+                dayOfLesson = 5;
+                break;
+        }
+        return dayOfLesson;
     }
 }

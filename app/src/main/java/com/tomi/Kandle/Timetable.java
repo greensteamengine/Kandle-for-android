@@ -31,6 +31,52 @@ public class Timetable implements Serializable {
         return lessons;
     }
 
+    public Lesson getLesson(Integer begining, Integer day){
+
+            for(Lesson lesson:lessons) {
+                //String dayString = lesson.getDay();
+                Integer dayOfLesson = lesson.getDayOfLesson();
+                /*
+                switch (dayString) {
+                    case ("Po"):
+                        dayOfLesson = 1;
+                        break;
+                    case ("Ut"):
+                        dayOfLesson = 2;
+                        break;
+                    case ("St"):
+                        dayOfLesson = 3;
+                        break;
+                    case ("Št"):
+                        dayOfLesson = 4;
+                        break;
+                    case ("Pi"):
+                        dayOfLesson = 5;
+                        break;
+                }
+                */
+                if (lesson.getSerialNumberOfStart().equals(begining) && dayOfLesson.equals(day)) {
+                    return lesson;
+                }
+            }
+        return null;
+    }
+
+    public Lesson getOngoingLesson(int start, Integer day){
+
+        for(Lesson lesson:lessons) {
+            //String dayString = lesson.getDay();
+            Integer dayOfLesson = lesson.getDayOfLesson();
+
+            if (lesson.getSerialNumberOfStart() <= start &&
+                    lesson.getSerialNumberOfEnd() >= start &&
+                    dayOfLesson.equals(day)) {
+                return lesson;
+            }
+        }
+        return null;
+    }
+
     public void addToTable(Lesson lesson){
         this.lessons.add(lesson);
     }

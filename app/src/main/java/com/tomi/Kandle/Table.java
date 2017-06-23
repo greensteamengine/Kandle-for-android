@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -16,11 +17,14 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.Toast;
+import android.widget.ArrayAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+
 
 
 public class Table implements Serializable {
@@ -32,7 +36,7 @@ public class Table implements Serializable {
     LinearLayout layout2;
     LinearLayout layout3;
     Spinner moznosti_spinner;
-    EditText searchText;
+    AutoCompleteTextView searchText;
     Button buttonSearch;
 
     Button tableSwitch;
@@ -91,7 +95,7 @@ public class Table implements Serializable {
         this.layout2 = (LinearLayout) activity.findViewById(R.id.linear2);
         this.layout3 = (LinearLayout) activity.findViewById(R.id.linear3);
         this.moznosti_spinner =(Spinner) activity.findViewById(R.id.moznosti_spinner);
-        this.searchText = (EditText)activity.findViewById(R.id.editText);
+        this.searchText = (AutoCompleteTextView)activity.findViewById(R.id.editText);
         this.buttonSearch = (Button)activity.findViewById(R.id.vyhladat);
         this.tableLayout =  (TableLayout)activity.findViewById(R.id.mTlayout);
         this.context = activity.getApplicationContext();
@@ -106,11 +110,14 @@ public class Table implements Serializable {
         tableColumns = giveEmptyTable();
     }
 
+
     void hideButtons(){
         if(searchingMode){
 
             layout1.setVisibility(View.INVISIBLE);
             scrollView.setVisibility(View.VISIBLE);
+
+            //searchText.showDropDown();
 
             searchingMode = false;
         }else{
@@ -119,6 +126,12 @@ public class Table implements Serializable {
             searchingMode = true;
         }
 
+    }
+
+    ArrayList<String> possibleChoices;
+
+    public void setCoices(ArrayList<String> choices){
+        possibleChoices =  choices;
     }
     /*
     void hideButtons(){
@@ -249,7 +262,47 @@ public class Table implements Serializable {
         }
     }
 
+    public void hideShow(){
+        searchText.post(new Runnable() {
+            public void run() {
 
+                hideButtons();
+            }
+        });
+    }
+
+    public void modifyAutoComplete(final ArrayList<String>  possiblities){
+
+
+        //searchText.setAdapter();
+        //ArrayAdapter<String> adapter = (ArrayAdapter<String>)searchText.getAdapter();
+        //adapter.clear();
+        //adapter.addAll(possiblities);
+
+
+
+        searchText.post(new Runnable() {
+            public void run() {
+                //myParser.expandAutoComplete(htmlString);
+                //AutoCompleteTextView searchText = (AutoCompleteTextView)activity.findViewById(R.id.editText);
+                //ArrayAdapter<String> adapter = (ArrayAdapter<String>)searchText.getAdapter();
+                //adapter.clear();
+                //adapter.addAll(possiblities);
+                possibleChoices.clear();
+                possibleChoices.addAll(possiblities);
+
+                for(String pos: possiblities){
+               //     adapter.add(pos);
+                    Log.v("added posibility",pos);
+                }
+            }
+        });
+        //searchText.showDropDown();
+        //textView.setAdapter(adapter);
+
+        //ArrayAdapter<String> adapter = textView.getAdapter()
+
+    }
 
 
     public void modifyTable(Timetable timetable){
@@ -278,33 +331,11 @@ public class Table implements Serializable {
     }
 
     public Lesson getLesson(Integer begining, Integer day){
-        if(currentTimetable != null){
-        for(Lesson l:currentTimetable.getLessons()) {
-            String dayString = l.getDay();
-            Integer dayOfLesson = 0;
-            switch (dayString) {
-                case ("Po"):
-                    dayOfLesson = 1;
-                    break;
-                case ("Ut"):
-                    dayOfLesson = 2;
-                    break;
-                case ("St"):
-                    dayOfLesson = 3;
-                    break;
-                case ("Št"):
-                    dayOfLesson = 4;
-                    break;
-                case ("Pi"):
-                    dayOfLesson = 5;
-                    break;
-            }
-            if (l.getSerialNumberOfStart().equals(begining) && dayOfLesson.equals(day)) {
-                return l;
-            }
-        }
-        }
-        return null;
+        return (currentTimetable != null) ? currentTimetable.getLesson(begining, day) : null;
+    }
+
+    public Lesson getOngoingLesson(int start, Integer day){
+        return (currentTimetable != null) ? currentTimetable.getOngoingLesson(start, day) : null;
     }
 
 
@@ -358,6 +389,9 @@ public class Table implements Serializable {
         viewDay.setBackgroundColor(Color.GRAY);
         tr.addView(viewDay);
         tableLayout.addView(tr);
+
+        Lesson current = null;
+        Lesson prewCurrent = null;
         for (int i = 1; i < 15; i++) {
 
             tr = new TableRow(context);
@@ -368,13 +402,26 @@ public class Table implements Serializable {
             viewTime.setBackgroundColor(Color.GRAY);
             tr.addView(viewTime);
 
-            Lesson current = getLesson(i, day);
+            /*
+            //Lesson current = getLesson(i, day);
+
+            if(currentTimetable != null){
+                current=  currentTimetable.getLesson(i, day);
+            }
+            */
+            current = getLesson(i, day);
+
+
+            //if(current!=null){
+
+           // }
 
             TextView room = new TextView(context);
             TextView name = new TextView(context);
 
             if(current != null){
 
+                prewCurrent = current;
                 room.setText(current.getRoom());
                 room.setBackgroundColor(Color.GRAY);
                 room.setTextColor(Color.BLACK);
@@ -388,6 +435,7 @@ public class Table implements Serializable {
             if (tableColumns.get(day).get(i).trim().length() > 0){
                 room.setBackgroundColor(Color.GRAY);
                 name.setBackgroundColor(Color.GRAY);
+                responseToast(tr, prewCurrent);
             }
             tr.addView(room);
             tr.addView(name);
@@ -410,18 +458,26 @@ public class Table implements Serializable {
         for(int i = 0; i<15; i++){
 
             TableRow tr = new TableRow(context);
+
             for(int j = 0; j<6;j++){
+                Lesson prewCurrent = null;
             //for(ArrayList<String> column: tableColumns){
 
                 TextView view = new TextView(context);
+
                 if(i == 0){
                     view.setText(tableColumns.get(j).get(i).substring(0, 2));
                 }else{
-                    Lesson current = getLesson(i, j);
+                    Lesson current =  getLesson(i, j);
 
+
+                    //responseToast(view, current);
                     if(current != null){
                         view.setText(current.room);
                     }
+                    prewCurrent = getOngoingLesson(i,j);
+
+                    responseToast(view, prewCurrent);
                     if(j == 0){
                         view.setText(tableColumns.get(j).get(i));
                     }
@@ -430,6 +486,9 @@ public class Table implements Serializable {
 
                 if (tableColumns.get(j).get(i).trim().length() > 0){
                     view.setBackgroundColor(Color.GRAY);
+                   // view.setText(tableColumns.get(j).get(i));
+
+
                 }//else{
                 //    view.setBackgroundColor(Color.WHITE);
                // }
@@ -440,6 +499,38 @@ public class Table implements Serializable {
                 tr.addView(view);
             }
             tableLayout.addView(tr);
+        }
+    }
+
+    private StringBuffer getResponseText( Lesson lesson){
+        StringBuffer responseText = new StringBuffer();
+        responseText.append(lesson.getName() + " (" + lesson.getType() + ")\n");
+        responseText.append(lesson.getRoom() +"\n");
+        responseText.append( lesson.getFrom() + " - " + lesson.getTo());
+        return responseText;
+    }
+
+    private void responseToast(TableRow tr, final Lesson lesson){
+         if(lesson != null) {
+             tr.setOnClickListener(new View.OnClickListener() {
+
+                 @Override
+                 public void onClick(View v) {
+                 Toast.makeText(context, getResponseText(lesson), Toast.LENGTH_SHORT).show();
+                 }
+             });
+         }
+    }
+
+    private void responseToast(TextView tv, final Lesson lesson) {
+        if (lesson != null) {
+            tv.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, getResponseText(lesson), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }
